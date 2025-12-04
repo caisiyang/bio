@@ -1,15 +1,303 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Neumorphic Profile</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/index.tsx"></script>
-  </body>
+    <meta name="description" content="Personal portfolio with neumorphic design">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        bg: '#F5EFEA',
+                        'text-main': '#605652',
+                        'text-sub': '#9E948F',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'neu': '8px 8px 16px rgba(188, 175, 166, 0.45), -8px -8px 16px rgba(255, 255, 255, 0.8)',
+                        'neu-pressed': 'inset 4px 4px 8px rgba(188, 175, 166, 0.45), inset -4px -4px 8px rgba(255, 255, 255, 0.9)',
+                        'neu-border': 'inset 2px 2px 5px rgba(255, 255, 255, 0.7), inset -3px -3px 7px rgba(206, 195, 186, 0.25)',
+                    },
+                },
+            },
+        }
+    </script>
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="min-h-screen bg-bg font-sans text-text-main">
+
+    <!-- Main Content -->
+    <main id="app" class="w-full flex flex-col items-center py-10 px-4 sm:px-0 relative">
+        <div class="w-full max-w-sm flex flex-col items-center">
+
+            <!-- Profile Card -->
+            <div class="neu-card w-full p-6 flex flex-col items-center text-center mb-8">
+                <div class="flex items-center w-full gap-5 mb-6">
+                    <div class="relative">
+                        <div class="w-20 h-20 rounded-full overflow-hidden border-4 border-white/50 shadow-inner">
+                            <img id="avatar" src="" alt="Avatar" class="w-full h-full object-cover">
+                        </div>
+                        <!-- Admin: Avatar Upload Button -->
+                        <button id="avatar-upload-btn"
+                            class="admin-only hidden absolute -bottom-1 -right-1 w-7 h-7 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center text-xs shadow-lg">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </button>
+                        <input type="file" id="avatar-input" accept="image/*" class="hidden">
+                    </div>
+                    <div class="flex flex-col items-start">
+                        <h1 id="profile-name" class="text-xl font-bold text-text-main leading-tight"></h1>
+                        <p id="profile-title" class="text-sm text-text-sub mt-1"></p>
+                    </div>
+                </div>
+                <a id="contact-link" href="#" class="w-full block">
+                    <button class="neu-button w-full py-4 text-text-main font-bold text-sm tracking-wide">
+                        <span id="contact-text"></span>
+                    </button>
+                </a>
+            </div>
+
+            <!-- Social Links -->
+            <div id="socials-grid" class="grid grid-cols-4 gap-4 w-full mb-10">
+                <!-- Dynamically populated -->
+            </div>
+
+            <!-- Projects Section -->
+            <div class="w-full mb-10">
+                <div class="flex items-center justify-between mb-5 pl-1">
+                    <h2 class="text-lg font-bold text-text-main">Recent Projects</h2>
+                    <button id="add-project-btn"
+                        class="admin-only hidden text-blue-500 hover:text-blue-600 text-sm font-semibold">+ Add</button>
+                </div>
+                <div id="projects-grid" class="grid grid-cols-2 gap-4">
+                    <!-- Dynamically populated -->
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="w-full mt-auto mb-8 flex flex-col items-center">
+                <p id="copyright" class="text-xs text-text-sub"></p>
+                <div class="w-32 h-1.5 bg-text-main/10 rounded-full mt-6"></div>
+            </footer>
+        </div>
+    </main>
+
+    <!-- Admin Toggle Button (Hidden by default, shown via ?admin=true) -->
+    <button id="admin-toggle"
+        class="hidden fixed bottom-6 right-6 z-40 w-12 h-12 rounded-full neu-button flex items-center justify-center text-text-sub hover:text-text-main transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+    </button>
+
+    <!-- Admin Panel (Sidebar) -->
+    <div id="admin-panel" class="hidden fixed inset-0 z-50">
+        <!-- Backdrop -->
+        <div id="admin-backdrop" class="absolute inset-0 bg-black/30 backdrop-blur-sm"></div>
+
+        <!-- Panel -->
+        <div
+            class="absolute right-0 top-0 h-full w-full max-w-md bg-bg border-l border-white/50 shadow-2xl overflow-y-auto">
+            <!-- Header -->
+            <div
+                class="sticky top-0 bg-bg/90 backdrop-blur-sm border-b border-gray-200/50 p-4 flex items-center justify-between">
+                <h2 class="text-lg font-bold text-text-main">管理后台</h2>
+                <button id="close-admin"
+                    class="p-2 text-text-sub hover:text-text-main rounded-lg hover:bg-white/50 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Panel Content -->
+            <div class="p-4 space-y-6">
+
+                <!-- GitHub Token Section -->
+                <section class="neu-card-inner p-4 rounded-xl">
+                    <h3 class="font-semibold text-text-main mb-3 flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+                        </svg>
+                        GitHub 设置
+                    </h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs text-text-sub mb-1">Personal Access Token</label>
+                            <input type="password" id="github-token" placeholder="ghp_xxxxxxxxxxxx"
+                                class="w-full bg-white/50 border border-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50">
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" id="remember-token" class="w-4 h-4 rounded border-gray-300">
+                            <label for="remember-token" class="text-sm text-text-sub">记住 Token</label>
+                        </div>
+                        <p class="text-xs text-text-sub">
+                            <a href="https://github.com/settings/tokens?type=beta" target="_blank"
+                                class="text-blue-500 hover:underline">获取 Token →</a>
+                            需要 "Contents: Read and write" 权限
+                        </p>
+                    </div>
+                </section>
+
+                <!-- Profile Section -->
+                <section class="neu-card-inner p-4 rounded-xl">
+                    <h3 class="font-semibold text-text-main mb-3">👤 个人信息</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs text-text-sub mb-1">名称</label>
+                            <input type="text" id="edit-name"
+                                class="w-full bg-white/50 border border-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-text-sub mb-1">简介</label>
+                            <input type="text" id="edit-title"
+                                class="w-full bg-white/50 border border-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-text-sub mb-1">联系按钮文字</label>
+                            <input type="text" id="edit-contact-text"
+                                class="w-full bg-white/50 border border-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-text-sub mb-1">联系链接</label>
+                            <input type="text" id="edit-contact-url"
+                                class="w-full bg-white/50 border border-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Social Links Section -->
+                <section class="neu-card-inner p-4 rounded-xl">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-semibold text-text-main">🔗 社交链接</h3>
+                        <button id="add-social-btn" class="text-blue-500 hover:text-blue-600 text-sm font-semibold">+
+                            添加</button>
+                    </div>
+                    <div id="socials-editor" class="space-y-3">
+                        <!-- Dynamically populated -->
+                    </div>
+                </section>
+
+                <!-- Theme Section -->
+                <section class="neu-card-inner p-4 rounded-xl">
+                    <h3 class="font-semibold text-text-main mb-3">🎨 主题设置</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs text-text-sub mb-2">风格</label>
+                            <div class="flex gap-2">
+                                <button data-style="default"
+                                    class="theme-btn flex-1 py-2 px-3 rounded-lg text-sm font-medium border border-white/50 bg-white/30 hover:bg-white/50 transition-colors">默认</button>
+                                <button data-style="glass"
+                                    class="theme-btn flex-1 py-2 px-3 rounded-lg text-sm font-medium border border-white/50 bg-white/30 hover:bg-white/50 transition-colors">毛玻璃</button>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-text-sub mb-2">主色调</label>
+                            <div class="flex items-center gap-3">
+                                <input type="color" id="primary-color"
+                                    class="w-10 h-10 rounded-lg border-0 cursor-pointer">
+                                <span id="primary-color-hex" class="text-sm text-text-sub"></span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Projects Section -->
+                <section class="neu-card-inner p-4 rounded-xl">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-semibold text-text-main">📁 项目管理</h3>
+                        <button id="add-project-editor-btn"
+                            class="text-blue-500 hover:text-blue-600 text-sm font-semibold">+ 添加</button>
+                    </div>
+                    <div id="projects-editor" class="space-y-3">
+                        <!-- Dynamically populated -->
+                    </div>
+                </section>
+
+                <!-- Security Section -->
+                <section class="neu-card-inner p-4 rounded-xl">
+                    <h3 class="font-semibold text-text-main mb-3">🔒 安全设置</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs text-text-sub mb-1">修改管理密码</label>
+                            <input type="password" id="new-password" placeholder="输入新密码"
+                                class="w-full bg-white/50 border border-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50">
+                        </div>
+                        <button id="change-password-btn"
+                            class="w-full py-2 px-4 bg-gray-500 hover:bg-gray-600 text-white rounded-lg text-sm font-semibold transition-colors">更新密码</button>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Footer Actions -->
+            <div class="sticky bottom-0 bg-bg/90 backdrop-blur-sm border-t border-gray-200/50 p-4 flex gap-3">
+                <button id="save-btn"
+                    class="flex-1 py-3 px-4 bg-blue-500 hover:bg-blue-600 text-white rounded-xl text-sm font-bold transition-colors flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                    </svg>
+                    保存到 GitHub
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="login-modal"
+        class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm p-4">
+        <div class="bg-bg w-full max-w-sm rounded-2xl shadow-2xl p-6 border border-white/50">
+            <h2 class="text-lg font-bold text-text-main mb-4 text-center">🔐 管理员登录</h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs text-text-sub mb-1">密码</label>
+                    <input type="password" id="login-password" placeholder="输入管理密码"
+                        class="w-full bg-white/50 border border-white rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50">
+                </div>
+                <p id="login-error" class="text-red-500 text-xs hidden">密码错误，请重试</p>
+                <div class="flex gap-3">
+                    <button id="login-cancel"
+                        class="flex-1 py-2.5 px-4 border border-gray-300 rounded-lg text-sm font-semibold text-text-sub hover:bg-white/50 transition-colors">取消</button>
+                    <button id="login-submit"
+                        class="flex-1 py-2.5 px-4 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-bold transition-colors">登录</button>
+                </div>
+            </div>
+            <p class="text-xs text-text-sub mt-4 text-center">默认密码: admin</p>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 hidden">
+        <div class="bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg text-sm font-medium"></div>
+    </div>
+
+    <!-- Main Script -->
+    <script src="script.js"></script>
+</body>
+
 </html>

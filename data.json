@@ -1,0 +1,80 @@
+{
+    "profile": {
+        "name": "Sai Studio AI Studio",
+        "title": "Creative Technologist",
+        "avatar": "https://lh3.googleusercontent.com/aida-public/AB6AXuAwFVE5Sl-OZfck4DmlcX7lrvurUeVIJYbFUCxyboMMdwjF24E6i_vLFzPGP5-4keKaaNy0PbfUMJUD4m5wbhQDFYvGXMD762erVhFhcCB8Ob5894pnJBsQHzOoyfvCCV2vmWc1p9RgMDdhUPOxYqtRdy1wcZ27pKyI0G2-LssaLDWysVBAFTPv-czq9CdC90obxH-PCWL6GexT0cFWjag2CduUqKCT8jSLRv02dXS7ZMBtHQC_YAWzRjXJ2Eno8BpxJxMpSFmhaoc",
+        "contactText": "Contact",
+        "contactUrl": "mailto:hello@example.com"
+    },
+    "socials": [
+        {
+            "id": "1",
+            "platform": "instagram",
+            "url": "#",
+            "color": "#E1306C"
+        },
+        {
+            "id": "2",
+            "platform": "linkedin",
+            "url": "#",
+            "color": "#0077B5"
+        },
+        {
+            "id": "3",
+            "platform": "twitter",
+            "url": "#",
+            "color": "#1DA1F2"
+        },
+        {
+            "id": "4",
+            "platform": "email",
+            "url": "mailto:test@test.com",
+            "color": "#EA4335"
+        },
+        {
+            "id": "5",
+            "platform": "github",
+            "url": "#",
+            "color": "#333333"
+        },
+        {
+            "id": "6",
+            "platform": "youtube",
+            "url": "#",
+            "color": "#FF0000"
+        },
+        {
+            "id": "7",
+            "platform": "web",
+            "url": "#",
+            "color": "#4285F4"
+        },
+        {
+            "id": "8",
+            "platform": "medium",
+            "url": "#",
+            "color": "#000000"
+        }
+    ],
+    "projects": [
+        {
+            "id": "p1",
+            "title": "Project Alpha: AI Art",
+            "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuC01AXbkn27Q3y6tOWQnF0HifivVOQg3YIUjsUaZKGiQXpEuTR1eAidOLqkDriD7r6PSnGhbFnWBxNx9Gc9iXawBD_tgC1_k6hGua6fD6Gf3pIwnJkhtljfqESO2SJ4mX97qZ2B6SwYeQDF26SZ7SXdPWtDZPen-GLyhjptPqS2QH32RA4nvfBGQZVY0szyJntxvMZb02bW2uMAyh2h8ZL5D_OqZeLZjal8YL-8h0FwiuozalJznPIfTvxFbzpZG5aEcliBN8GaiKw",
+            "link": "#"
+        },
+        {
+            "id": "p2",
+            "title": "Project Beta: Generative",
+            "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuAySn5NrEXbkj_y4towf9Xe7HXMihJxnO4qK6ktOfPsWwaht3BIvg8bTKF95DP3SuFCjITn6zFtFJgHXKHXnXm9m4yZMPHaK6o4xl4btAwlPSZGiq6-zu0U9OCoEqriNk6ogZ0sQ7bNAwlOLz_xtng_YSUHr_HEGkQK0yavRNIxHevcRMrBDqaCstFwKNmmjOJMm5Qj_qSImE3Vyk8MbLgWXTDnYCtqsJv3Z6BaqLaS1C2QoDaNusZOFBArJ-Wr0t_SRC4HRv0XbF0",
+            "link": "#"
+        }
+    ],
+    "theme": {
+        "style": "default",
+        "primaryColor": "#605652"
+    },
+    "admin": {
+        "passwordHash": "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"
+    }
+}
