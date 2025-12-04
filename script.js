@@ -40,7 +40,6 @@ const DEFAULT_PRIMARY_COLORS = [
 // Utility Functions
 // ============================================
 
-// SHA-256 Hash
 async function sha256(message) {
     const msgBuffer = new TextEncoder().encode(message);
     const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
@@ -48,12 +47,10 @@ async function sha256(message) {
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-// Generate unique ID
 function generateId() {
     return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
 }
 
-// Show toast notification
 function showToast(message, type = 'info', duration = 3000) {
     const toast = document.getElementById('toast');
     const msgEl = document.getElementById('toast-message');
@@ -71,7 +68,6 @@ function showToast(message, type = 'info', duration = 3000) {
     }, duration);
 }
 
-// Get icon SVG by platform
 function getIconSvg(platform) {
     const icons = {
         instagram: '<path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>',
@@ -87,7 +83,6 @@ function getIconSvg(platform) {
     return `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">${icons[platform] || icons.web}</svg>`;
 }
 
-// Get saved color history
 function getColorHistory(key) {
     try {
         return JSON.parse(localStorage.getItem(key)) || [];
@@ -96,7 +91,6 @@ function getColorHistory(key) {
     }
 }
 
-// Save color to history
 function saveColorToHistory(key, color) {
     let history = getColorHistory(key);
     history = history.filter(c => c !== color);
@@ -114,7 +108,6 @@ async function loadData() {
         const response = await fetch('data.json?t=' + Date.now());
         appData = await response.json();
 
-        // Ensure theme has bgColor
         if (!appData.theme.bgColor) {
             appData.theme.bgColor = appData.theme.style === 'glass' ? '#667eea' : '#F5EFEA';
         }
@@ -130,24 +123,22 @@ async function loadData() {
 function renderPage() {
     if (!appData) return;
 
-    // Profile
     document.getElementById('avatar').src = appData.profile.avatar;
     document.getElementById('profile-name').textContent = appData.profile.name;
     document.getElementById('profile-title').textContent = appData.profile.title;
     document.getElementById('contact-text').textContent = appData.profile.contactText;
     document.getElementById('contact-link').href = appData.profile.contactUrl;
 
-    // Socials
     const socialsGrid = document.getElementById('socials-grid');
     socialsGrid.innerHTML = appData.socials.map(social => `
-        <a href="${social.url}" target="_blank" rel="noopener noreferrer">
-            <button class="neu-button w-full aspect-square rounded-2xl text-xl hover:scale-105 transition-transform" style="color: ${social.color}">
+        <a href="${social.url}" target="_blank" rel="noopener noreferrer" class="block">
+            <div class="neu-button w-full aspect-square rounded-2xl flex flex-col items-center justify-center gap-1 p-2 hover:scale-105 transition-transform" style="color: ${social.color}">
                 ${getIconSvg(social.platform)}
-            </button>
+                ${social.label ? `<span class="text-[10px] font-medium text-text-sub truncate w-full text-center">${social.label}</span>` : ''}
+            </div>
         </a>
     `).join('');
 
-    // Projects
     const projectsGrid = document.getElementById('projects-grid');
     projectsGrid.innerHTML = appData.projects.map(project => `
         <a href="${project.link || '#'}" target="_blank" rel="noopener noreferrer" class="block">
@@ -160,10 +151,8 @@ function renderPage() {
         </a>
     `).join('');
 
-    // Copyright
     document.getElementById('copyright').textContent = `© ${new Date().getFullYear()} ${appData.profile.name}`;
 
-    // If admin mode, populate editor forms
     if (isAdminMode) {
         populateEditors();
     }
@@ -177,7 +166,6 @@ function applyTheme() {
     document.body.classList.add(`theme-${style}`);
     document.documentElement.style.setProperty('--primary-color', primaryColor);
 
-    // Apply background color
     if (style === 'glass') {
         document.body.style.background = `linear-gradient(135deg, ${bgColor} 0%, ${adjustColor(bgColor, -20)} 100%)`;
     } else {
@@ -185,7 +173,6 @@ function applyTheme() {
     }
 }
 
-// Adjust color brightness
 function adjustColor(color, amount) {
     const hex = color.replace('#', '');
     const r = Math.max(0, Math.min(255, parseInt(hex.substr(0, 2), 16) + amount));
@@ -204,13 +191,11 @@ function checkAdminAccess() {
         document.getElementById('admin-toggle').classList.remove('hidden');
     }
 
-    // Auto-login if session is valid
     if (localStorage.getItem('admin_logged_in') === 'true') {
         isAdminMode = true;
         document.getElementById('admin-toggle').classList.remove('hidden');
     }
 
-    // Check if token is verified
     if (localStorage.getItem('github_token_verified') === 'true') {
         isTokenVerified = true;
         githubToken = localStorage.getItem('github_token');
@@ -252,7 +237,6 @@ function openAdminPanel() {
     document.getElementById('admin-panel').classList.remove('hidden');
     document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
 
-    // Load saved token
     const savedToken = localStorage.getItem('github_token');
     if (savedToken) {
         githubToken = savedToken;
@@ -331,19 +315,16 @@ function closeAdminPanel() {
 }
 
 function populateEditors() {
-    // Profile
     document.getElementById('edit-name').value = appData.profile.name;
     document.getElementById('edit-title').value = appData.profile.title;
     document.getElementById('edit-contact-text').value = appData.profile.contactText;
     document.getElementById('edit-contact-url').value = appData.profile.contactUrl;
 
-    // Theme
     document.querySelectorAll('.theme-btn').forEach(btn => {
         btn.classList.toggle('ring-2', btn.dataset.style === appData.theme.style);
         btn.classList.toggle('ring-blue-500', btn.dataset.style === appData.theme.style);
     });
 
-    // Colors
     document.getElementById('primary-color').value = appData.theme.primaryColor;
     document.getElementById('primary-color-hex').textContent = appData.theme.primaryColor;
     document.getElementById('bg-color').value = appData.theme.bgColor || '#F5EFEA';
@@ -355,7 +336,6 @@ function populateEditors() {
 }
 
 function renderColorPresets() {
-    // Background color presets
     const bgPresetsContainer = document.getElementById('bg-color-presets');
     const bgHistory = getColorHistory('bg_color_history');
     let bgPresets = [...DEFAULT_BG_COLORS];
@@ -374,7 +354,6 @@ function renderColorPresets() {
                 title="${p.name}"></button>
     `).join('');
 
-    // Primary color presets
     const primaryPresetsContainer = document.getElementById('primary-color-presets');
     const primaryHistory = getColorHistory('primary_color_history');
     let primaryPresets = [...DEFAULT_PRIMARY_COLORS];
@@ -397,17 +376,20 @@ function renderColorPresets() {
 function renderSocialsEditor() {
     const container = document.getElementById('socials-editor');
     container.innerHTML = appData.socials.map((social, index) => `
-        <div class="flex items-center gap-2 p-2 bg-white rounded-lg border border-gray-200" data-id="${social.id}">
-            <select class="social-platform flex-shrink-0 bg-white text-gray-800 text-sm p-1 rounded border border-gray-300" data-index="${index}">
-                ${['instagram', 'linkedin', 'twitter', 'email', 'github', 'youtube', 'web', 'medium', 'wechat'].map(p =>
+        <div class="p-2 bg-white rounded-lg border border-gray-200 space-y-2" data-id="${social.id}">
+            <div class="flex items-center gap-2">
+                <select class="social-platform flex-shrink-0 bg-white text-gray-800 text-sm p-1 rounded border border-gray-300" data-index="${index}">
+                    ${['instagram', 'linkedin', 'twitter', 'email', 'github', 'youtube', 'web', 'medium', 'wechat'].map(p =>
         `<option value="${p}" ${p === social.platform ? 'selected' : ''}>${p}</option>`
     ).join('')}
-            </select>
-            <input type="text" class="social-url flex-1 bg-white text-gray-800 border border-gray-300 rounded p-1.5 text-xs" value="${social.url}" placeholder="URL" data-index="${index}">
-            <input type="color" class="social-color w-8 h-8 rounded cursor-pointer" value="${social.color}" data-index="${index}">
-            <button class="delete-social p-1 text-red-500 hover:text-red-600 cursor-pointer" data-index="${index}">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-            </button>
+                </select>
+                <input type="color" class="social-color w-8 h-8 rounded cursor-pointer" value="${social.color}" data-index="${index}">
+                <button class="delete-social p-1 text-red-500 hover:text-red-600 cursor-pointer" data-index="${index}">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                </button>
+            </div>
+            <input type="text" class="social-label w-full bg-white text-gray-800 border border-gray-300 rounded p-1.5 text-xs" value="${social.label || ''}" placeholder="显示文字 (如: 微信号)" data-index="${index}">
+            <input type="text" class="social-url w-full bg-white text-gray-800 border border-gray-300 rounded p-1.5 text-xs" value="${social.url}" placeholder="链接 URL" data-index="${index}">
         </div>
     `).join('');
 }
@@ -450,6 +432,9 @@ function updateSocialsFromForm() {
     document.querySelectorAll('.social-color').forEach((input, index) => {
         if (appData.socials[index]) appData.socials[index].color = input.value;
     });
+    document.querySelectorAll('.social-label').forEach((input, index) => {
+        if (appData.socials[index]) appData.socials[index].label = input.value;
+    });
 }
 
 function updateProjectsFromForm() {
@@ -466,7 +451,8 @@ function addSocial() {
         id: generateId(),
         platform: 'web',
         url: '#',
-        color: '#333333'
+        color: '#333333',
+        label: ''
     });
     renderSocialsEditor();
 }
@@ -496,29 +482,53 @@ function deleteProject(index) {
 // ============================================
 
 async function getFileSha(path) {
+    console.log('[DEBUG] Getting SHA for:', path);
+    console.log('[DEBUG] Using repo:', GITHUB_REPO);
+    console.log('[DEBUG] Token exists:', !!githubToken);
+
+    const url = `https://api.github.com/repos/${GITHUB_REPO}/contents/${path}?ref=${GITHUB_BRANCH}&_t=${Date.now()}`;
+    console.log('[DEBUG] Fetching:', url);
+
     try {
-        const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${path}?ref=${GITHUB_BRANCH}&_=${Date.now()}`, {
+        const response = await fetch(url, {
+            method: 'GET',
             headers: {
                 'Authorization': `token ${githubToken}`,
-                'Accept': 'application/vnd.github.v3+json',
-                'Cache-Control': 'no-cache, no-store, must-revalidate',
-                'Pragma': 'no-cache'
-            },
-            cache: 'no-store'
+                'Accept': 'application/vnd.github.v3+json'
+            }
         });
+
+        console.log('[DEBUG] Response status:', response.status);
+
         if (response.ok) {
             const data = await response.json();
+            console.log('[DEBUG] SHA found:', data.sha);
             return data.sha;
+        } else if (response.status === 404) {
+            console.log('[DEBUG] File not found (404), this is a new file');
+            return null;
+        } else {
+            const errorData = await response.json();
+            console.error('[DEBUG] Error response:', errorData);
+            throw new Error(`Failed to get file info: ${response.status} - ${errorData.message || response.statusText}`);
         }
-        return null;
     } catch (error) {
-        console.error('Failed to get SHA:', error);
-        return null;
+        console.error('[DEBUG] Exception in getFileSha:', error);
+        throw error;
     }
 }
 
 async function uploadToGitHub(path, content, message) {
-    const sha = await getFileSha(path);
+    console.log('[DEBUG] Starting upload to:', path);
+
+    let sha = null;
+    try {
+        sha = await getFileSha(path);
+    } catch (error) {
+        console.error('[DEBUG] Failed to get SHA, will try to create new file:', error);
+    }
+
+    console.log('[DEBUG] SHA for upload:', sha);
 
     const body = {
         message: message,
@@ -526,9 +536,12 @@ async function uploadToGitHub(path, content, message) {
         branch: GITHUB_BRANCH
     };
 
+    // 关键修复：只有当 SHA 存在时才添加到请求体
     if (sha) {
         body.sha = sha;
     }
+
+    console.log('[DEBUG] Request body keys:', Object.keys(body));
 
     const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${path}`, {
         method: 'PUT',
@@ -540,8 +553,11 @@ async function uploadToGitHub(path, content, message) {
         body: JSON.stringify(body)
     });
 
+    console.log('[DEBUG] Upload response status:', response.status);
+
     if (!response.ok) {
         const error = await response.json();
+        console.error('[DEBUG] Upload error:', error);
         throw new Error(error.message || 'Upload failed');
     }
 
@@ -555,7 +571,13 @@ async function uploadImageToGitHub(file, fileName) {
             try {
                 const base64Content = reader.result.split(',')[1];
                 const path = `images/${fileName}`;
-                const sha = await getFileSha(path);
+
+                let sha = null;
+                try {
+                    sha = await getFileSha(path);
+                } catch (e) {
+                    console.log('[DEBUG] Image does not exist yet, will create');
+                }
 
                 const body = {
                     message: `Upload image: ${fileName}`,
@@ -578,7 +600,8 @@ async function uploadImageToGitHub(file, fileName) {
                 });
 
                 if (!response.ok) {
-                    throw new Error('Image upload failed');
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Image upload failed');
                 }
 
                 const data = await response.json();
@@ -614,7 +637,7 @@ async function saveToGitHub() {
         showToast('保存成功！', 'success');
         renderPage();
     } catch (error) {
-        console.error('Save failed:', error);
+        console.error('[DEBUG] Save failed:', error);
         showToast('保存失败: ' + error.message, 'error');
     } finally {
         saveBtn.disabled = false;
