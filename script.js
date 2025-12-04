@@ -124,11 +124,43 @@ function applyTheme() {
 // Admin Mode
 // ============================================
 
+// Secret admin trigger state
+let secretClickCount = 0;
+let secretClickTimer = null;
+
 function checkAdminAccess() {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('admin') === 'true') {
         document.getElementById('admin-toggle').classList.remove('hidden');
     }
+}
+
+// Secret trigger: click copyright 5 times within 2 seconds
+function setupSecretTrigger() {
+    const copyright = document.getElementById('copyright');
+    copyright.style.cursor = 'default';
+    copyright.style.userSelect = 'none';
+
+    copyright.addEventListener('click', () => {
+        secretClickCount++;
+
+        // Reset timer on each click
+        if (secretClickTimer) {
+            clearTimeout(secretClickTimer);
+        }
+
+        // Check if 5 clicks reached
+        if (secretClickCount >= 5) {
+            secretClickCount = 0;
+            document.getElementById('admin-toggle').classList.remove('hidden');
+            showToast('🔓 管理模式已激活');
+        }
+
+        // Reset count after 2 seconds of no clicks
+        secretClickTimer = setTimeout(() => {
+            secretClickCount = 0;
+        }, 2000);
+    });
 }
 
 function showLoginModal() {
@@ -450,6 +482,7 @@ async function changePassword() {
 document.addEventListener('DOMContentLoaded', () => {
     loadData();
     checkAdminAccess();
+    setupSecretTrigger();
 
     // Admin Toggle
     document.getElementById('admin-toggle').addEventListener('click', showLoginModal);
