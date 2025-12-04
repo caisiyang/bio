@@ -120,13 +120,13 @@
 
         <!-- Panel -->
         <div
-            class="absolute right-0 top-0 h-full w-full max-w-md bg-bg border-l border-white/50 shadow-2xl overflow-y-auto">
+            class="absolute right-0 top-0 h-full w-full max-w-md bg-[#F5EFEA] border-l border-white/50 shadow-2xl overflow-y-auto">
             <!-- Header -->
             <div
-                class="sticky top-0 bg-bg/90 backdrop-blur-sm border-b border-gray-200/50 p-4 flex items-center justify-between">
-                <h2 class="text-lg font-bold text-text-main">管理后台</h2>
+                class="sticky top-0 bg-[#F5EFEA]/95 backdrop-blur-sm border-b border-gray-200/50 p-4 flex items-center justify-between z-10">
+                <h2 class="text-lg font-bold text-gray-800">管理后台</h2>
                 <button id="close-admin"
-                    class="p-2 text-text-sub hover:text-text-main rounded-lg hover:bg-white/50 transition-colors">
+                    class="p-2 text-gray-500 hover:text-gray-800 rounded-lg hover:bg-white/50 transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M6 18L18 6M6 6l12 12" />
@@ -138,8 +138,8 @@
             <div class="p-4 space-y-6">
 
                 <!-- GitHub Token Section -->
-                <section class="neu-card-inner p-4 rounded-xl">
-                    <h3 class="font-semibold text-text-main mb-3 flex items-center gap-2">
+                <section class="bg-white/60 p-4 rounded-xl border border-gray-200">
+                    <h3 class="font-semibold text-gray-800 mb-3 flex items-center gap-2">
                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                             <path
                                 d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
@@ -148,15 +148,16 @@
                     </h3>
                     <div class="space-y-3">
                         <div>
-                            <label class="block text-xs text-text-sub mb-1">Personal Access Token</label>
-                            <input type="password" id="github-token" placeholder="ghp_xxxxxxxxxxxx"
-                                class="w-full bg-white/50 border border-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50">
+                            <label class="block text-xs text-gray-500 mb-1">Personal Access Token</label>
+                            <div class="flex gap-2">
+                                <input type="password" id="github-token" placeholder="ghp_xxxxxxxxxxxx"
+                                    class="flex-1 bg-white border border-gray-300 rounded-lg p-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400/50">
+                                <button id="verify-token-btn"
+                                    class="px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm font-medium">验证</button>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <input type="checkbox" id="remember-token" class="w-4 h-4 rounded border-gray-300">
-                            <label for="remember-token" class="text-sm text-text-sub">记住 Token</label>
-                        </div>
-                        <p class="text-xs text-text-sub">
+                        <div id="token-status" class="hidden text-sm p-2 rounded-lg"></div>
+                        <p class="text-xs text-gray-500">
                             <a href="https://github.com/settings/tokens?type=beta" target="_blank"
                                 class="text-blue-500 hover:underline">获取 Token →</a>
                             需要 "Contents: Read and write" 权限
@@ -165,36 +166,36 @@
                 </section>
 
                 <!-- Profile Section -->
-                <section class="neu-card-inner p-4 rounded-xl">
-                    <h3 class="font-semibold text-text-main mb-3">👤 个人信息</h3>
+                <section class="bg-white/60 p-4 rounded-xl border border-gray-200">
+                    <h3 class="font-semibold text-gray-800 mb-3">👤 个人信息</h3>
                     <div class="space-y-3">
                         <div>
-                            <label class="block text-xs text-text-sub mb-1">名称</label>
+                            <label class="block text-xs text-gray-500 mb-1">名称</label>
                             <input type="text" id="edit-name"
-                                class="w-full bg-white/50 border border-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50">
+                                class="w-full bg-white border border-gray-300 rounded-lg p-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400/50">
                         </div>
                         <div>
-                            <label class="block text-xs text-text-sub mb-1">简介</label>
+                            <label class="block text-xs text-gray-500 mb-1">简介</label>
                             <input type="text" id="edit-title"
-                                class="w-full bg-white/50 border border-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50">
+                                class="w-full bg-white border border-gray-300 rounded-lg p-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400/50">
                         </div>
                         <div>
-                            <label class="block text-xs text-text-sub mb-1">联系按钮文字</label>
+                            <label class="block text-xs text-gray-500 mb-1">联系按钮文字</label>
                             <input type="text" id="edit-contact-text"
-                                class="w-full bg-white/50 border border-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50">
+                                class="w-full bg-white border border-gray-300 rounded-lg p-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400/50">
                         </div>
                         <div>
-                            <label class="block text-xs text-text-sub mb-1">联系链接</label>
+                            <label class="block text-xs text-gray-500 mb-1">联系链接</label>
                             <input type="text" id="edit-contact-url"
-                                class="w-full bg-white/50 border border-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50">
+                                class="w-full bg-white border border-gray-300 rounded-lg p-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400/50">
                         </div>
                     </div>
                 </section>
 
                 <!-- Social Links Section -->
-                <section class="neu-card-inner p-4 rounded-xl">
+                <section class="bg-white/60 p-4 rounded-xl border border-gray-200">
                     <div class="flex items-center justify-between mb-3">
-                        <h3 class="font-semibold text-text-main">🔗 社交链接</h3>
+                        <h3 class="font-semibold text-gray-800">🔗 社交链接</h3>
                         <button id="add-social-btn" class="text-blue-500 hover:text-blue-600 text-sm font-semibold">+
                             添加</button>
                     </div>
@@ -204,33 +205,46 @@
                 </section>
 
                 <!-- Theme Section -->
-                <section class="neu-card-inner p-4 rounded-xl">
-                    <h3 class="font-semibold text-text-main mb-3">🎨 主题设置</h3>
-                    <div class="space-y-3">
+                <section class="bg-white/60 p-4 rounded-xl border border-gray-200">
+                    <h3 class="font-semibold text-gray-800 mb-3">🎨 主题设置</h3>
+                    <div class="space-y-4">
                         <div>
-                            <label class="block text-xs text-text-sub mb-2">风格</label>
+                            <label class="block text-xs text-gray-500 mb-2">风格</label>
                             <div class="flex gap-2">
                                 <button data-style="default"
-                                    class="theme-btn flex-1 py-2 px-3 rounded-lg text-sm font-medium border border-white/50 bg-white/30 hover:bg-white/50 transition-colors">默认</button>
+                                    class="theme-btn flex-1 py-2 px-3 rounded-lg text-sm font-medium border border-gray-300 bg-white text-gray-800 hover:bg-gray-50 transition-colors">默认</button>
                                 <button data-style="glass"
-                                    class="theme-btn flex-1 py-2 px-3 rounded-lg text-sm font-medium border border-white/50 bg-white/30 hover:bg-white/50 transition-colors">毛玻璃</button>
+                                    class="theme-btn flex-1 py-2 px-3 rounded-lg text-sm font-medium border border-gray-300 bg-white text-gray-800 hover:bg-gray-50 transition-colors">毛玻璃</button>
                             </div>
                         </div>
                         <div>
-                            <label class="block text-xs text-text-sub mb-2">主色调</label>
-                            <div class="flex items-center gap-3">
+                            <label class="block text-xs text-gray-500 mb-2">背景色</label>
+                            <div class="flex items-center gap-3 mb-2">
+                                <input type="color" id="bg-color" class="w-10 h-10 rounded-lg border-0 cursor-pointer">
+                                <span id="bg-color-hex" class="text-sm text-gray-600 font-mono"></span>
+                            </div>
+                            <div class="flex flex-wrap gap-2" id="bg-color-presets">
+                                <!-- 默认配色预设 -->
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-500 mb-2">主色调</label>
+                            <div class="flex items-center gap-3 mb-2">
                                 <input type="color" id="primary-color"
                                     class="w-10 h-10 rounded-lg border-0 cursor-pointer">
-                                <span id="primary-color-hex" class="text-sm text-text-sub"></span>
+                                <span id="primary-color-hex" class="text-sm text-gray-600 font-mono"></span>
+                            </div>
+                            <div class="flex flex-wrap gap-2" id="primary-color-presets">
+                                <!-- 主色调预设 -->
                             </div>
                         </div>
                     </div>
                 </section>
 
                 <!-- Projects Section -->
-                <section class="neu-card-inner p-4 rounded-xl">
+                <section class="bg-white/60 p-4 rounded-xl border border-gray-200">
                     <div class="flex items-center justify-between mb-3">
-                        <h3 class="font-semibold text-text-main">📁 项目管理</h3>
+                        <h3 class="font-semibold text-gray-800">📁 项目管理</h3>
                         <button id="add-project-editor-btn"
                             class="text-blue-500 hover:text-blue-600 text-sm font-semibold">+ 添加</button>
                     </div>
@@ -240,13 +254,13 @@
                 </section>
 
                 <!-- Security Section -->
-                <section class="neu-card-inner p-4 rounded-xl">
-                    <h3 class="font-semibold text-text-main mb-3">🔒 安全设置</h3>
+                <section class="bg-white/60 p-4 rounded-xl border border-gray-200">
+                    <h3 class="font-semibold text-gray-800 mb-3">🔒 安全设置</h3>
                     <div class="space-y-3">
                         <div>
-                            <label class="block text-xs text-text-sub mb-1">修改管理密码</label>
+                            <label class="block text-xs text-gray-500 mb-1">修改管理密码</label>
                             <input type="password" id="new-password" placeholder="输入新密码"
-                                class="w-full bg-white/50 border border-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50">
+                                class="w-full bg-white border border-gray-300 rounded-lg p-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400/50">
                         </div>
                         <button id="change-password-btn"
                             class="w-full py-2 px-4 bg-gray-500 hover:bg-gray-600 text-white rounded-lg text-sm font-semibold transition-colors">更新密码</button>
@@ -255,7 +269,7 @@
             </div>
 
             <!-- Footer Actions -->
-            <div class="sticky bottom-0 bg-bg/90 backdrop-blur-sm border-t border-gray-200/50 p-4 flex gap-3">
+            <div class="sticky bottom-0 bg-[#F5EFEA]/95 backdrop-blur-sm border-t border-gray-200/50 p-4 flex gap-3">
                 <button id="save-btn"
                     class="flex-1 py-3 px-4 bg-blue-500 hover:bg-blue-600 text-white rounded-xl text-sm font-bold transition-colors flex items-center justify-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -271,23 +285,23 @@
     <!-- Login Modal -->
     <div id="login-modal"
         class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm p-4">
-        <div class="bg-bg w-full max-w-sm rounded-2xl shadow-2xl p-6 border border-white/50">
-            <h2 class="text-lg font-bold text-text-main mb-4 text-center">🔐 管理员登录</h2>
+        <div class="bg-[#F5EFEA] w-full max-w-sm rounded-2xl shadow-2xl p-6 border border-white/50">
+            <h2 class="text-lg font-bold text-gray-800 mb-4 text-center">🔐 管理员登录</h2>
             <div class="space-y-4">
                 <div>
-                    <label class="block text-xs text-text-sub mb-1">密码</label>
+                    <label class="block text-xs text-gray-500 mb-1">密码</label>
                     <input type="password" id="login-password" placeholder="输入管理密码"
-                        class="w-full bg-white/50 border border-white rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50">
+                        class="w-full bg-white border border-gray-300 rounded-lg p-3 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400/50">
                 </div>
                 <p id="login-error" class="text-red-500 text-xs hidden">密码错误，请重试</p>
                 <div class="flex gap-3">
                     <button id="login-cancel"
-                        class="flex-1 py-2.5 px-4 border border-gray-300 rounded-lg text-sm font-semibold text-text-sub hover:bg-white/50 transition-colors">取消</button>
+                        class="flex-1 py-2.5 px-4 border border-gray-300 rounded-lg text-sm font-semibold text-gray-600 hover:bg-white/50 transition-colors">取消</button>
                     <button id="login-submit"
                         class="flex-1 py-2.5 px-4 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-bold transition-colors">登录</button>
                 </div>
             </div>
-            <p class="text-xs text-text-sub mt-4 text-center">默认密码: admin</p>
+            <p class="text-xs text-gray-500 mt-4 text-center">默认密码: admin</p>
         </div>
     </div>
 

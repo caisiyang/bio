@@ -9,9 +9,29 @@
 let appData = null;
 let isAdminMode = false;
 let githubToken = null;
+let isTokenVerified = false;
 
 const GITHUB_REPO = 'caisiyang/bio';
 const GITHUB_BRANCH = 'main';
+
+// Default color presets
+const DEFAULT_BG_COLORS = [
+    { color: '#F5EFEA', name: '默认奶茶' },
+    { color: '#667eea', name: '默认紫 (毛玻璃)' },
+    { color: '#1a1a2e', name: '深夜蓝' },
+    { color: '#f8f9fa', name: '纯白' },
+    { color: '#ffecd2', name: '暖橙' },
+    { color: '#a8edea', name: '薄荷' },
+];
+
+const DEFAULT_PRIMARY_COLORS = [
+    { color: '#605652', name: '默认棕' },
+    { color: '#667eea', name: '紫罗兰' },
+    { color: '#f093fb', name: '浅粉' },
+    { color: '#4facfe', name: '天蓝' },
+    { color: '#43e97b', name: '翠绿' },
+    { color: '#fa709a', name: '桃红' },
+];
 
 // ============================================
 // Utility Functions
@@ -54,6 +74,26 @@ function getIconSvg(platform) {
     return `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">${icons[platform] || icons.web}</svg>`;
 }
 
+// Get saved color history
+function getColorHistory(key) {
+    try {
+        return JSON.parse(localStorage.getItem(key)) || [];
+    } catch {
+        return [];
+    }
+}
+
+// Save color to history
+function saveColorToHistory(key, color) {
+    let history = getColorHistory(key);
+    // Remove if exists, add to front
+    history = history.filter(c => c !== color);
+    history.unshift(color);
+    // Keep only last 5
+    history = history.slice(0, 5);
+    localStorage.setItem(key, JSON.stringify(history));
+}
+
 // ============================================
 // Data Loading & Rendering
 // ============================================
@@ -62,6 +102,12 @@ async function loadData() {
     try {
         const response = await fetch('data.json?t=' + Date.now());
         appData = await response.json();
+
+        // Ensure theme has bgColor
+        if (!appData.theme.bgColor) {
+            appData.theme.bgColor = appData.theme.style === 'glass' ? '#667eea' : '#F5EFEA';
+        }
+
         renderPage();
         applyTheme();
     } catch (error) {
@@ -115,17 +161,32 @@ function renderPage() {
 function applyTheme() {
     if (!appData) return;
 
-    const { style, primaryColor } = appData.theme;
+    const { style, primaryColor, bgColor } = appData.theme;
     document.body.classList.remove('theme-default', 'theme-glass');
     document.body.classList.add(`theme-${style}`);
     document.documentElement.style.setProperty('--primary-color', primaryColor);
+
+    // Apply background color
+    if (style === 'glass') {
+        document.body.style.background = `linear-gradient(135deg, ${bgColor} 0%, ${adjustColor(bgColor, -20)} 100%)`;
+    } else {
+        document.body.style.background = bgColor;
+    }
+}
+
+// Adjust color brightness
+function adjustColor(color, amount) {
+    const hex = color.replace('#', '');
+    const r = Math.max(0, Math.min(255, parseInt(hex.substr(0, 2), 16) + amount));
+    const g = Math.max(0, Math.min(255, parseInt(hex.substr(2, 2), 16) + amount));
+    const b = Math.max(0, Math.min(255, parseInt(hex.substr(4, 2), 16) + amount));
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 }
 
 // ============================================
 // Admin Mode
 // ============================================
 
-// Secret admin trigger state
 let secretClickCount = 0;
 let secretClickTimer = null;
 
@@ -135,13 +196,18 @@ function checkAdminAccess() {
         document.getElementById('admin-toggle').classList.remove('hidden');
     }
 
-    // Check if already logged in (no password needed after first login)
+    // Check if already logged in
     if (localStorage.getItem('admin_logged_in') === 'true') {
         isAdminMode = true;
     }
+
+    // Check if token is verified
+    if (localStorage.getItem('github_token_verified') === 'true') {
+        isTokenVerified = true;
+        githubToken = localStorage.getItem('github_token');
+    }
 }
 
-// Secret trigger: click/tap copyright 5 times within 2 seconds
 function setupSecretTrigger() {
     const copyright = document.getElementById('copyright');
     copyright.style.cursor = 'default';
@@ -151,33 +217,25 @@ function setupSecretTrigger() {
 
     const handleTrigger = (e) => {
         e.preventDefault();
+        e.stopPropagation();
         secretClickCount++;
 
-        // Reset timer on each click
-        if (secretClickTimer) {
-            clearTimeout(secretClickTimer);
-        }
+        if (secretClickTimer) clearTimeout(secretClickTimer);
 
-        // Check if 5 clicks reached
         if (secretClickCount >= 5) {
             secretClickCount = 0;
             document.getElementById('admin-toggle').classList.remove('hidden');
             showToast('🔓 管理模式已激活');
         }
 
-        // Reset count after 2 seconds of no clicks
-        secretClickTimer = setTimeout(() => {
-            secretClickCount = 0;
-        }, 2000);
+        secretClickTimer = setTimeout(() => { secretClickCount = 0; }, 2000);
     };
 
-    // Support both mouse and touch
     copyright.addEventListener('click', handleTrigger);
-    copyright.addEventListener('touchend', handleTrigger);
+    copyright.addEventListener('touchstart', handleTrigger);
 }
 
 function showLoginModal() {
-    // If already logged in, skip password
     if (localStorage.getItem('admin_logged_in') === 'true') {
         isAdminMode = true;
         openAdminPanel();
@@ -199,19 +257,10 @@ async function attemptLogin() {
 
     if (hash === appData.admin.passwordHash) {
         isAdminMode = true;
-        // Remember login state
         localStorage.setItem('admin_logged_in', 'true');
         hideLoginModal();
         openAdminPanel();
         showToast('登录成功');
-
-        // Load saved token
-        const savedToken = localStorage.getItem('github_token');
-        if (savedToken) {
-            githubToken = savedToken;
-            document.getElementById('github-token').value = savedToken;
-            document.getElementById('remember-token').checked = true;
-        }
     } else {
         document.getElementById('login-error').classList.remove('hidden');
     }
@@ -221,15 +270,72 @@ function openAdminPanel() {
     document.getElementById('admin-panel').classList.remove('hidden');
     document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
 
-    // Load saved token if not already loaded
+    // Load saved token
     const savedToken = localStorage.getItem('github_token');
-    if (savedToken && !githubToken) {
+    if (savedToken) {
         githubToken = savedToken;
         document.getElementById('github-token').value = savedToken;
-        document.getElementById('remember-token').checked = true;
     }
 
+    // Update token UI
+    updateTokenUI();
+
     populateEditors();
+}
+
+function updateTokenUI() {
+    const tokenInput = document.getElementById('github-token');
+    const verifyBtn = document.getElementById('verify-token-btn');
+    const statusDiv = document.getElementById('token-status');
+
+    if (isTokenVerified && githubToken) {
+        tokenInput.disabled = true;
+        tokenInput.classList.add('bg-gray-100', 'cursor-not-allowed');
+        verifyBtn.textContent = '已验证 ✓';
+        verifyBtn.disabled = true;
+        verifyBtn.classList.remove('bg-green-500', 'hover:bg-green-600');
+        verifyBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
+        statusDiv.classList.remove('hidden');
+        statusDiv.classList.add('bg-green-100', 'text-green-700');
+        statusDiv.textContent = '✓ Token 已验证，可以正常保存';
+    }
+}
+
+async function verifyToken() {
+    const token = document.getElementById('github-token').value;
+    if (!token) {
+        showToast('请输入 Token');
+        return;
+    }
+
+    const verifyBtn = document.getElementById('verify-token-btn');
+    verifyBtn.textContent = '验证中...';
+    verifyBtn.disabled = true;
+
+    try {
+        // Test token by getting repo info
+        const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO}`, {
+            headers: {
+                'Authorization': `token ${token}`,
+                'Accept': 'application/vnd.github.v3+json'
+            }
+        });
+
+        if (response.ok) {
+            githubToken = token;
+            isTokenVerified = true;
+            localStorage.setItem('github_token', token);
+            localStorage.setItem('github_token_verified', 'true');
+            updateTokenUI();
+            showToast('Token 验证成功！');
+        } else {
+            throw new Error('Token 无效');
+        }
+    } catch (error) {
+        verifyBtn.textContent = '验证';
+        verifyBtn.disabled = false;
+        showToast('Token 验证失败: ' + error.message);
+    }
 }
 
 function closeAdminPanel() {
@@ -248,8 +354,15 @@ function populateEditors() {
         btn.classList.toggle('ring-2', btn.dataset.style === appData.theme.style);
         btn.classList.toggle('ring-blue-500', btn.dataset.style === appData.theme.style);
     });
+
+    // Colors
     document.getElementById('primary-color').value = appData.theme.primaryColor;
     document.getElementById('primary-color-hex').textContent = appData.theme.primaryColor;
+    document.getElementById('bg-color').value = appData.theme.bgColor || '#F5EFEA';
+    document.getElementById('bg-color-hex').textContent = appData.theme.bgColor || '#F5EFEA';
+
+    // Render color presets
+    renderColorPresets();
 
     // Socials Editor
     renderSocialsEditor();
@@ -258,10 +371,51 @@ function populateEditors() {
     renderProjectsEditor();
 }
 
+function renderColorPresets() {
+    // Background color presets
+    const bgPresetsContainer = document.getElementById('bg-color-presets');
+    const bgHistory = getColorHistory('bg_color_history');
+    let bgPresets = [...DEFAULT_BG_COLORS];
+
+    // Add history colors that are not in defaults
+    bgHistory.forEach(c => {
+        if (!bgPresets.find(p => p.color === c)) {
+            bgPresets.unshift({ color: c, name: '历史' });
+        }
+    });
+
+    bgPresetsContainer.innerHTML = bgPresets.slice(0, 8).map(p => `
+        <button class="color-preset w-8 h-8 rounded-lg border-2 border-white shadow-sm hover:scale-110 transition-transform" 
+                style="background: ${p.color}" 
+                data-color="${p.color}" 
+                data-type="bg"
+                title="${p.name}"></button>
+    `).join('');
+
+    // Primary color presets
+    const primaryPresetsContainer = document.getElementById('primary-color-presets');
+    const primaryHistory = getColorHistory('primary_color_history');
+    let primaryPresets = [...DEFAULT_PRIMARY_COLORS];
+
+    primaryHistory.forEach(c => {
+        if (!primaryPresets.find(p => p.color === c)) {
+            primaryPresets.unshift({ color: c, name: '历史' });
+        }
+    });
+
+    primaryPresetsContainer.innerHTML = primaryPresets.slice(0, 8).map(p => `
+        <button class="color-preset w-8 h-8 rounded-lg border-2 border-white shadow-sm hover:scale-110 transition-transform" 
+                style="background: ${p.color}" 
+                data-color="${p.color}" 
+                data-type="primary"
+                title="${p.name}"></button>
+    `).join('');
+}
+
 function renderSocialsEditor() {
     const container = document.getElementById('socials-editor');
     container.innerHTML = appData.socials.map((social, index) => `
-        <div class="flex items-center gap-2 p-2 bg-white/30 rounded-lg" data-id="${social.id}">
+        <div class="flex items-center gap-2 p-2 bg-white rounded-lg border border-gray-200" data-id="${social.id}">
             <select class="social-platform flex-shrink-0 bg-white text-gray-800 text-sm p-1 rounded border border-gray-300" data-index="${index}">
                 ${['instagram', 'linkedin', 'twitter', 'email', 'github', 'youtube', 'web', 'medium', 'wechat'].map(p =>
         `<option value="${p}" ${p === social.platform ? 'selected' : ''}>${p}</option>`
@@ -279,7 +433,7 @@ function renderSocialsEditor() {
 function renderProjectsEditor() {
     const container = document.getElementById('projects-editor');
     container.innerHTML = appData.projects.map((project, index) => `
-        <div class="p-3 bg-white/30 rounded-lg space-y-2" data-id="${project.id}">
+        <div class="p-3 bg-white rounded-lg border border-gray-200 space-y-2" data-id="${project.id}">
             <input type="text" class="project-title w-full bg-white text-gray-800 border border-gray-300 rounded p-2 text-sm" value="${project.title}" placeholder="项目名称" data-index="${index}">
             <input type="text" class="project-link w-full bg-white text-gray-800 border border-gray-300 rounded p-2 text-sm" value="${project.link || ''}" placeholder="项目链接" data-index="${index}">
             <div class="flex items-center gap-2">
@@ -306,22 +460,22 @@ function updateProfileFromForm() {
 
 function updateSocialsFromForm() {
     document.querySelectorAll('.social-platform').forEach((select, index) => {
-        appData.socials[index].platform = select.value;
+        if (appData.socials[index]) appData.socials[index].platform = select.value;
     });
     document.querySelectorAll('.social-url').forEach((input, index) => {
-        appData.socials[index].url = input.value;
+        if (appData.socials[index]) appData.socials[index].url = input.value;
     });
     document.querySelectorAll('.social-color').forEach((input, index) => {
-        appData.socials[index].color = input.value;
+        if (appData.socials[index]) appData.socials[index].color = input.value;
     });
 }
 
 function updateProjectsFromForm() {
     document.querySelectorAll('.project-title').forEach((input, index) => {
-        appData.projects[index].title = input.value;
+        if (appData.projects[index]) appData.projects[index].title = input.value;
     });
     document.querySelectorAll('.project-link').forEach((input, index) => {
-        appData.projects[index].link = input.value;
+        if (appData.projects[index]) appData.projects[index].link = input.value;
     });
 }
 
@@ -361,13 +515,14 @@ function deleteProject(index) {
 
 async function getFileSha(path) {
     try {
-        // Add timestamp to prevent browser caching
-        const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${path}?ref=${GITHUB_BRANCH}&t=${Date.now()}`, {
+        const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${path}?ref=${GITHUB_BRANCH}&_=${Date.now()}`, {
             headers: {
                 'Authorization': `token ${githubToken}`,
                 'Accept': 'application/vnd.github.v3+json',
-                'Cache-Control': 'no-cache'
-            }
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache'
+            },
+            cache: 'no-store'
         });
         if (response.ok) {
             const data = await response.json();
@@ -375,12 +530,18 @@ async function getFileSha(path) {
         }
         return null;
     } catch (error) {
+        console.error('Failed to get SHA:', error);
         return null;
     }
 }
 
 async function uploadToGitHub(path, content, message) {
+    // Always get fresh SHA
     const sha = await getFileSha(path);
+
+    if (!sha) {
+        console.warn('Could not get SHA, file may not exist yet');
+    }
 
     const body = {
         message: message,
@@ -455,19 +616,9 @@ async function uploadImageToGitHub(file, fileName) {
 }
 
 async function saveToGitHub() {
-    // Get token
-    githubToken = document.getElementById('github-token').value;
-
-    if (!githubToken) {
-        showToast('请输入 GitHub Token');
+    if (!isTokenVerified || !githubToken) {
+        showToast('请先验证 GitHub Token');
         return;
-    }
-
-    // Remember token if checked
-    if (document.getElementById('remember-token').checked) {
-        localStorage.setItem('github_token', githubToken);
-    } else {
-        localStorage.removeItem('github_token');
     }
 
     // Update data from forms
@@ -480,7 +631,6 @@ async function saveToGitHub() {
     saveBtn.innerHTML = '<svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> 保存中...';
 
     try {
-        // Upload data.json
         const jsonContent = JSON.stringify(appData, null, 2);
         await uploadToGitHub('data.json', jsonContent, 'Update data.json via CMS');
 
@@ -530,20 +680,61 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('close-admin').addEventListener('click', closeAdminPanel);
     document.getElementById('admin-backdrop').addEventListener('click', closeAdminPanel);
 
+    // Verify Token
+    document.getElementById('verify-token-btn').addEventListener('click', verifyToken);
+
     // Theme buttons
     document.querySelectorAll('.theme-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             appData.theme.style = btn.dataset.style;
+            // Set default bg for theme
+            if (btn.dataset.style === 'glass' && appData.theme.bgColor === '#F5EFEA') {
+                appData.theme.bgColor = '#667eea';
+                document.getElementById('bg-color').value = '#667eea';
+                document.getElementById('bg-color-hex').textContent = '#667eea';
+            } else if (btn.dataset.style === 'default' && appData.theme.bgColor === '#667eea') {
+                appData.theme.bgColor = '#F5EFEA';
+                document.getElementById('bg-color').value = '#F5EFEA';
+                document.getElementById('bg-color-hex').textContent = '#F5EFEA';
+            }
             applyTheme();
             populateEditors();
         });
+    });
+
+    // Background color
+    document.getElementById('bg-color').addEventListener('input', (e) => {
+        appData.theme.bgColor = e.target.value;
+        document.getElementById('bg-color-hex').textContent = e.target.value;
+        saveColorToHistory('bg_color_history', e.target.value);
+        applyTheme();
     });
 
     // Primary color
     document.getElementById('primary-color').addEventListener('input', (e) => {
         appData.theme.primaryColor = e.target.value;
         document.getElementById('primary-color-hex').textContent = e.target.value;
+        saveColorToHistory('primary_color_history', e.target.value);
         applyTheme();
+    });
+
+    // Color presets (event delegation)
+    document.addEventListener('click', (e) => {
+        const preset = e.target.closest('.color-preset');
+        if (preset) {
+            const color = preset.dataset.color;
+            const type = preset.dataset.type;
+            if (type === 'bg') {
+                appData.theme.bgColor = color;
+                document.getElementById('bg-color').value = color;
+                document.getElementById('bg-color-hex').textContent = color;
+            } else {
+                appData.theme.primaryColor = color;
+                document.getElementById('primary-color').value = color;
+                document.getElementById('primary-color-hex').textContent = color;
+            }
+            applyTheme();
+        }
     });
 
     // Add social
@@ -578,7 +769,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!file) return;
 
         if (!githubToken) {
-            showToast('请先在设置中输入 GitHub Token');
+            showToast('请先验证 GitHub Token');
             return;
         }
 
@@ -602,7 +793,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!file) return;
 
             if (!githubToken) {
-                showToast('请先输入 GitHub Token');
+                showToast('请先验证 GitHub Token');
                 return;
             }
 
