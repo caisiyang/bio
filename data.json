@@ -8,24 +8,6 @@
   },
   "socials": [
     {
-      "id": "1",
-      "platform": "instagram",
-      "url": "#",
-      "color": "#e1306c"
-    },
-    {
-      "id": "2",
-      "platform": "linkedin",
-      "url": "#",
-      "color": "#0077b5"
-    },
-    {
-      "id": "3",
-      "platform": "twitter",
-      "url": "#",
-      "color": "#1da1f2"
-    },
-    {
       "id": "4",
       "platform": "email",
       "url": "mailto:sai@saaaai.com",
@@ -38,31 +20,19 @@
       "color": "#333333"
     },
     {
-      "id": "6",
-      "platform": "youtube",
-      "url": "#",
-      "color": "#ff0000"
-    },
-    {
       "id": "7",
       "platform": "web",
       "url": "#",
       "color": "#4285f4"
     },
     {
-      "id": "8",
-      "platform": "medium",
+      "id": "mirpv4shpd4b5nn54",
+      "platform": "web",
       "url": "#",
-      "color": "#000000"
+      "color": "#333333"
     }
   ],
   "projects": [
-    {
-      "id": "p1",
-      "title": "从日本看中国",
-      "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuC01AXbkn27Q3y6tOWQnF0HifivVOQg3YIUjsUaZKGiQXpEuTR1eAidOLqkDriD7r6PSnGhbFnWBxNx9Gc9iXawBD_tgC1_k6hGua6fD6Gf3pIwnJkhtljfqESO2SJ4mX97qZ2B6SwYeQDF26SZ7SXdPWtDZPen-GLyhjptPqS2QH32RA4nvfBGQZVY0szyJntxvMZb02bW2uMAyh2h8ZL5D_OqZeLZjal8YL-8h0FwiuozalJznPIfTvxFbzpZG5aEcliBN8GaiKw",
-      "link": "https://cn.saaaai.com/"
-    },
     {
       "id": "p2",
       "title": "Coming Soon",
@@ -72,7 +42,7 @@
   ],
   "theme": {
     "style": "default",
-    "primaryColor": "#605652"
+    "primaryColor": "#b0806d"
   },
   "admin": {
     "passwordHash": "2be4e33aa3e21f6ff7ad144f8fd58228a1cce3b50340b4805ff0c63480eec488"
