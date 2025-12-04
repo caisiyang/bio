@@ -40,7 +40,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 
-<body class="min-h-screen bg-bg font-sans text-text-main">
+<body class="min-h-screen bg-bg font-sans text-text-main transition-colors duration-300">
 
     <!-- Main Content -->
     <main id="app" class="w-full flex flex-col items-center py-10 px-4 sm:px-0 relative">
@@ -55,7 +55,7 @@
                         </div>
                         <!-- Admin: Avatar Upload Button -->
                         <button id="avatar-upload-btn"
-                            class="admin-only hidden absolute -bottom-1 -right-1 w-7 h-7 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center text-xs shadow-lg">
+                            class="admin-only hidden absolute -bottom-1 -right-1 w-7 h-7 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center text-xs shadow-lg z-10 cursor-pointer">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
@@ -87,7 +87,8 @@
                 <div class="flex items-center justify-between mb-5 pl-1">
                     <h2 class="text-lg font-bold text-text-main">Recent Projects</h2>
                     <button id="add-project-btn"
-                        class="admin-only hidden text-blue-500 hover:text-blue-600 text-sm font-semibold">+ Add</button>
+                        class="admin-only hidden text-blue-500 hover:text-blue-600 text-sm font-semibold cursor-pointer">+
+                        Add</button>
                 </div>
                 <div id="projects-grid" class="grid grid-cols-2 gap-4">
                     <!-- Dynamically populated -->
@@ -95,17 +96,21 @@
             </div>
 
             <!-- Footer -->
-            <footer class="w-full mt-auto mb-8 flex flex-col items-center">
-                <p id="copyright" class="text-xs text-text-sub"></p>
-                <div class="w-32 h-1.5 bg-text-main/10 rounded-full mt-6"></div>
+            <footer class="w-full mt-auto mb-8 flex flex-col items-center gap-4">
+                <div class="flex items-center gap-2">
+                    <p id="copyright" class="text-xs text-text-sub"></p>
+                    <button id="footer-admin-link"
+                        class="text-[10px] text-text-sub/30 hover:text-text-sub cursor-pointer transition-colors px-1">Admin</button>
+                </div>
+                <div class="w-32 h-1.5 bg-text-main/10 rounded-full"></div>
             </footer>
         </div>
     </main>
 
-    <!-- Admin Toggle Button (Hidden by default, shown via ?admin=true) -->
+    <!-- Admin Toggle Button (Floating Gear) -->
     <button id="admin-toggle"
-        class="hidden fixed bottom-6 right-6 z-40 w-12 h-12 rounded-full neu-button flex items-center justify-center text-text-sub hover:text-text-main transition-colors">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        class="hidden fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full neu-button flex items-center justify-center text-text-sub hover:text-text-main transition-colors shadow-lg cursor-pointer">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -114,20 +119,20 @@
     </button>
 
     <!-- Admin Panel (Sidebar) -->
-    <div id="admin-panel" class="hidden fixed inset-0 z-50">
+    <div id="admin-panel" class="hidden fixed inset-0 z-[60]">
         <!-- Backdrop -->
-        <div id="admin-backdrop" class="absolute inset-0 bg-black/30 backdrop-blur-sm"></div>
+        <div id="admin-backdrop" class="absolute inset-0 bg-black/30 backdrop-blur-sm cursor-pointer"></div>
 
         <!-- Panel -->
         <div
-            class="absolute right-0 top-0 h-full w-full max-w-md bg-[#F5EFEA] border-l border-white/50 shadow-2xl overflow-y-auto">
+            class="absolute right-0 top-0 h-full w-full max-w-md bg-[#F5EFEA] border-l border-white/50 shadow-2xl overflow-y-auto transform transition-transform duration-300">
             <!-- Header -->
             <div
                 class="sticky top-0 bg-[#F5EFEA]/95 backdrop-blur-sm border-b border-gray-200/50 p-4 flex items-center justify-between z-10">
                 <h2 class="text-lg font-bold text-gray-800">管理后台</h2>
                 <button id="close-admin"
-                    class="p-2 text-gray-500 hover:text-gray-800 rounded-lg hover:bg-white/50 transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    class="p-2 text-gray-500 hover:text-gray-800 rounded-lg hover:bg-white/50 transition-colors cursor-pointer">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -135,7 +140,7 @@
             </div>
 
             <!-- Panel Content -->
-            <div class="p-4 space-y-6">
+            <div class="p-4 space-y-6 pb-24">
 
                 <!-- GitHub Token Section -->
                 <section class="bg-white/60 p-4 rounded-xl border border-gray-200">
@@ -144,24 +149,41 @@
                             <path
                                 d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
                         </svg>
-                        GitHub 设置
+                        GitHub 连接
                     </h3>
-                    <div class="space-y-3">
+
+                    <!-- Token Input (Hidden if verified) -->
+                    <div id="token-input-section" class="space-y-3">
                         <div>
                             <label class="block text-xs text-gray-500 mb-1">Personal Access Token</label>
                             <div class="flex gap-2">
                                 <input type="password" id="github-token" placeholder="ghp_xxxxxxxxxxxx"
                                     class="flex-1 bg-white border border-gray-300 rounded-lg p-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400/50">
                                 <button id="verify-token-btn"
-                                    class="px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm font-medium">验证</button>
+                                    class="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium transition-colors cursor-pointer">验证</button>
                             </div>
                         </div>
-                        <div id="token-status" class="hidden text-sm p-2 rounded-lg"></div>
                         <p class="text-xs text-gray-500">
                             <a href="https://github.com/settings/tokens?type=beta" target="_blank"
                                 class="text-blue-500 hover:underline">获取 Token →</a>
                             需要 "Contents: Read and write" 权限
                         </p>
+                    </div>
+
+                    <!-- Token Status (Shown if verified) -->
+                    <div id="token-status-section" class="hidden">
+                        <div
+                            class="flex items-center justify-between bg-green-50 border border-green-200 rounded-lg p-3">
+                            <div class="flex items-center gap-2 text-green-700 text-sm font-medium">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 13l4 4L19 7" />
+                                </svg>
+                                已连接 GitHub
+                            </div>
+                            <button id="reset-token-btn"
+                                class="text-xs text-gray-500 hover:text-red-500 underline cursor-pointer">重置</button>
+                        </div>
                     </div>
                 </section>
 
@@ -196,8 +218,8 @@
                 <section class="bg-white/60 p-4 rounded-xl border border-gray-200">
                     <div class="flex items-center justify-between mb-3">
                         <h3 class="font-semibold text-gray-800">🔗 社交链接</h3>
-                        <button id="add-social-btn" class="text-blue-500 hover:text-blue-600 text-sm font-semibold">+
-                            添加</button>
+                        <button id="add-social-btn"
+                            class="text-blue-500 hover:text-blue-600 text-sm font-semibold cursor-pointer">+ 添加</button>
                     </div>
                     <div id="socials-editor" class="space-y-3">
                         <!-- Dynamically populated -->
@@ -212,9 +234,9 @@
                             <label class="block text-xs text-gray-500 mb-2">风格</label>
                             <div class="flex gap-2">
                                 <button data-style="default"
-                                    class="theme-btn flex-1 py-2 px-3 rounded-lg text-sm font-medium border border-gray-300 bg-white text-gray-800 hover:bg-gray-50 transition-colors">默认</button>
+                                    class="theme-btn flex-1 py-2 px-3 rounded-lg text-sm font-medium border border-gray-300 bg-white text-gray-800 hover:bg-gray-50 transition-colors cursor-pointer">默认</button>
                                 <button data-style="glass"
-                                    class="theme-btn flex-1 py-2 px-3 rounded-lg text-sm font-medium border border-gray-300 bg-white text-gray-800 hover:bg-gray-50 transition-colors">毛玻璃</button>
+                                    class="theme-btn flex-1 py-2 px-3 rounded-lg text-sm font-medium border border-gray-300 bg-white text-gray-800 hover:bg-gray-50 transition-colors cursor-pointer">毛玻璃</button>
                             </div>
                         </div>
                         <div>
@@ -246,7 +268,7 @@
                     <div class="flex items-center justify-between mb-3">
                         <h3 class="font-semibold text-gray-800">📁 项目管理</h3>
                         <button id="add-project-editor-btn"
-                            class="text-blue-500 hover:text-blue-600 text-sm font-semibold">+ 添加</button>
+                            class="text-blue-500 hover:text-blue-600 text-sm font-semibold cursor-pointer">+ 添加</button>
                     </div>
                     <div id="projects-editor" class="space-y-3">
                         <!-- Dynamically populated -->
@@ -263,15 +285,16 @@
                                 class="w-full bg-white border border-gray-300 rounded-lg p-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400/50">
                         </div>
                         <button id="change-password-btn"
-                            class="w-full py-2 px-4 bg-gray-500 hover:bg-gray-600 text-white rounded-lg text-sm font-semibold transition-colors">更新密码</button>
+                            class="w-full py-2 px-4 bg-gray-500 hover:bg-gray-600 text-white rounded-lg text-sm font-semibold transition-colors cursor-pointer">更新密码</button>
                     </div>
                 </section>
             </div>
 
             <!-- Footer Actions -->
-            <div class="sticky bottom-0 bg-[#F5EFEA]/95 backdrop-blur-sm border-t border-gray-200/50 p-4 flex gap-3">
+            <div
+                class="sticky bottom-0 bg-[#F5EFEA]/95 backdrop-blur-sm border-t border-gray-200/50 p-4 flex gap-3 z-20">
                 <button id="save-btn"
-                    class="flex-1 py-3 px-4 bg-blue-500 hover:bg-blue-600 text-white rounded-xl text-sm font-bold transition-colors flex items-center justify-center gap-2">
+                    class="flex-1 py-3 px-4 bg-blue-500 hover:bg-blue-600 text-white rounded-xl text-sm font-bold transition-colors flex items-center justify-center gap-2 shadow-lg cursor-pointer">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
@@ -284,7 +307,7 @@
 
     <!-- Login Modal -->
     <div id="login-modal"
-        class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm p-4">
+        class="hidden fixed inset-0 z-[70] flex items-center justify-center bg-black/30 backdrop-blur-sm p-4">
         <div class="bg-[#F5EFEA] w-full max-w-sm rounded-2xl shadow-2xl p-6 border border-white/50">
             <h2 class="text-lg font-bold text-gray-800 mb-4 text-center">🔐 管理员登录</h2>
             <div class="space-y-4">
@@ -296,9 +319,9 @@
                 <p id="login-error" class="text-red-500 text-xs hidden">密码错误，请重试</p>
                 <div class="flex gap-3">
                     <button id="login-cancel"
-                        class="flex-1 py-2.5 px-4 border border-gray-300 rounded-lg text-sm font-semibold text-gray-600 hover:bg-white/50 transition-colors">取消</button>
+                        class="flex-1 py-2.5 px-4 border border-gray-300 rounded-lg text-sm font-semibold text-gray-600 hover:bg-white/50 transition-colors cursor-pointer">取消</button>
                     <button id="login-submit"
-                        class="flex-1 py-2.5 px-4 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-bold transition-colors">登录</button>
+                        class="flex-1 py-2.5 px-4 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-bold transition-colors cursor-pointer">登录</button>
                 </div>
             </div>
             <p class="text-xs text-gray-500 mt-4 text-center">默认密码: admin</p>
@@ -306,8 +329,12 @@
     </div>
 
     <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 hidden">
-        <div class="bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg text-sm font-medium"></div>
+    <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 z-[80] hidden transition-opacity duration-300">
+        <div
+            class="bg-gray-800/90 backdrop-blur text-white px-4 py-3 rounded-xl shadow-xl text-sm font-medium flex items-center gap-2">
+            <span id="toast-icon">ℹ️</span>
+            <span id="toast-message"></span>
+        </div>
     </div>
 
     <!-- Main Script -->

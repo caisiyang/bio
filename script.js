@@ -11,8 +11,11 @@ let isAdminMode = false;
 let githubToken = null;
 let isTokenVerified = false;
 
-const GITHUB_REPO = 'caisiyang/bio';
+// GitHub Config - Change these if you rename your repo
+const GITHUB_OWNER = 'caisiyang';
+const GITHUB_REPO_NAME = 'bio';
 const GITHUB_BRANCH = 'main';
+const GITHUB_REPO = `${GITHUB_OWNER}/${GITHUB_REPO_NAME}`;
 
 // Default color presets
 const DEFAULT_BG_COLORS = [
@@ -51,11 +54,21 @@ function generateId() {
 }
 
 // Show toast notification
-function showToast(message, duration = 3000) {
+function showToast(message, type = 'info', duration = 3000) {
     const toast = document.getElementById('toast');
-    toast.querySelector('div').textContent = message;
-    toast.classList.remove('hidden');
-    setTimeout(() => toast.classList.add('hidden'), duration);
+    const msgEl = document.getElementById('toast-message');
+    const iconEl = document.getElementById('toast-icon');
+
+    msgEl.textContent = message;
+    iconEl.textContent = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+
+    toast.classList.remove('hidden', 'opacity-0');
+
+    if (window.toastTimer) clearTimeout(window.toastTimer);
+    window.toastTimer = setTimeout(() => {
+        toast.classList.add('opacity-0');
+        setTimeout(() => toast.classList.add('hidden'), 300);
+    }, duration);
 }
 
 // Get icon SVG by platform
@@ -86,10 +99,8 @@ function getColorHistory(key) {
 // Save color to history
 function saveColorToHistory(key, color) {
     let history = getColorHistory(key);
-    // Remove if exists, add to front
     history = history.filter(c => c !== color);
     history.unshift(color);
-    // Keep only last 5
     history = history.slice(0, 5);
     localStorage.setItem(key, JSON.stringify(history));
 }
@@ -112,7 +123,7 @@ async function loadData() {
         applyTheme();
     } catch (error) {
         console.error('Failed to load data:', error);
-        showToast('加载数据失败');
+        showToast('加载数据失败', 'error');
     }
 }
 
@@ -187,18 +198,16 @@ function adjustColor(color, amount) {
 // Admin Mode
 // ============================================
 
-let secretClickCount = 0;
-let secretClickTimer = null;
-
 function checkAdminAccess() {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('admin') === 'true') {
         document.getElementById('admin-toggle').classList.remove('hidden');
     }
 
-    // Check if already logged in
+    // Auto-login if session is valid
     if (localStorage.getItem('admin_logged_in') === 'true') {
         isAdminMode = true;
+        document.getElementById('admin-toggle').classList.remove('hidden');
     }
 
     // Check if token is verified
@@ -206,33 +215,6 @@ function checkAdminAccess() {
         isTokenVerified = true;
         githubToken = localStorage.getItem('github_token');
     }
-}
-
-function setupSecretTrigger() {
-    const copyright = document.getElementById('copyright');
-    copyright.style.cursor = 'default';
-    copyright.style.userSelect = 'none';
-    copyright.style.webkitUserSelect = 'none';
-    copyright.style.webkitTapHighlightColor = 'transparent';
-
-    const handleTrigger = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        secretClickCount++;
-
-        if (secretClickTimer) clearTimeout(secretClickTimer);
-
-        if (secretClickCount >= 5) {
-            secretClickCount = 0;
-            document.getElementById('admin-toggle').classList.remove('hidden');
-            showToast('🔓 管理模式已激活');
-        }
-
-        secretClickTimer = setTimeout(() => { secretClickCount = 0; }, 2000);
-    };
-
-    copyright.addEventListener('click', handleTrigger);
-    copyright.addEventListener('touchstart', handleTrigger);
 }
 
 function showLoginModal() {
@@ -260,7 +242,7 @@ async function attemptLogin() {
         localStorage.setItem('admin_logged_in', 'true');
         hideLoginModal();
         openAdminPanel();
-        showToast('登录成功');
+        showToast('登录成功', 'success');
     } else {
         document.getElementById('login-error').classList.remove('hidden');
     }
@@ -277,43 +259,36 @@ function openAdminPanel() {
         document.getElementById('github-token').value = savedToken;
     }
 
-    // Update token UI
     updateTokenUI();
-
     populateEditors();
 }
 
 function updateTokenUI() {
-    const tokenInput = document.getElementById('github-token');
-    const verifyBtn = document.getElementById('verify-token-btn');
-    const statusDiv = document.getElementById('token-status');
+    const inputSection = document.getElementById('token-input-section');
+    const statusSection = document.getElementById('token-status-section');
 
     if (isTokenVerified && githubToken) {
-        tokenInput.disabled = true;
-        tokenInput.classList.add('bg-gray-100', 'cursor-not-allowed');
-        verifyBtn.textContent = '已验证 ✓';
-        verifyBtn.disabled = true;
-        verifyBtn.classList.remove('bg-green-500', 'hover:bg-green-600');
-        verifyBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
-        statusDiv.classList.remove('hidden');
-        statusDiv.classList.add('bg-green-100', 'text-green-700');
-        statusDiv.textContent = '✓ Token 已验证，可以正常保存';
+        inputSection.classList.add('hidden');
+        statusSection.classList.remove('hidden');
+    } else {
+        inputSection.classList.remove('hidden');
+        statusSection.classList.add('hidden');
     }
 }
 
 async function verifyToken() {
-    const token = document.getElementById('github-token').value;
+    const token = document.getElementById('github-token').value.trim();
     if (!token) {
-        showToast('请输入 Token');
+        showToast('请输入 Token', 'error');
         return;
     }
 
     const verifyBtn = document.getElementById('verify-token-btn');
+    const originalText = verifyBtn.textContent;
     verifyBtn.textContent = '验证中...';
     verifyBtn.disabled = true;
 
     try {
-        // Test token by getting repo info
         const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO}`, {
             headers: {
                 'Authorization': `token ${token}`,
@@ -327,14 +302,27 @@ async function verifyToken() {
             localStorage.setItem('github_token', token);
             localStorage.setItem('github_token_verified', 'true');
             updateTokenUI();
-            showToast('Token 验证成功！');
+            showToast('Token 验证成功！', 'success');
         } else {
-            throw new Error('Token 无效');
+            throw new Error('Token 无效或权限不足');
         }
     } catch (error) {
-        verifyBtn.textContent = '验证';
+        showToast('验证失败: ' + error.message, 'error');
+    } finally {
+        verifyBtn.textContent = originalText;
         verifyBtn.disabled = false;
-        showToast('Token 验证失败: ' + error.message);
+    }
+}
+
+function resetToken() {
+    if (confirm('确定要重置 GitHub Token 吗？')) {
+        localStorage.removeItem('github_token');
+        localStorage.removeItem('github_token_verified');
+        isTokenVerified = false;
+        githubToken = null;
+        document.getElementById('github-token').value = '';
+        updateTokenUI();
+        showToast('Token 已重置', 'info');
     }
 }
 
@@ -361,13 +349,8 @@ function populateEditors() {
     document.getElementById('bg-color').value = appData.theme.bgColor || '#F5EFEA';
     document.getElementById('bg-color-hex').textContent = appData.theme.bgColor || '#F5EFEA';
 
-    // Render color presets
     renderColorPresets();
-
-    // Socials Editor
     renderSocialsEditor();
-
-    // Projects Editor
     renderProjectsEditor();
 }
 
@@ -377,7 +360,6 @@ function renderColorPresets() {
     const bgHistory = getColorHistory('bg_color_history');
     let bgPresets = [...DEFAULT_BG_COLORS];
 
-    // Add history colors that are not in defaults
     bgHistory.forEach(c => {
         if (!bgPresets.find(p => p.color === c)) {
             bgPresets.unshift({ color: c, name: '历史' });
@@ -385,7 +367,7 @@ function renderColorPresets() {
     });
 
     bgPresetsContainer.innerHTML = bgPresets.slice(0, 8).map(p => `
-        <button class="color-preset w-8 h-8 rounded-lg border-2 border-white shadow-sm hover:scale-110 transition-transform" 
+        <button class="color-preset w-8 h-8 rounded-lg border-2 border-white shadow-sm hover:scale-110 transition-transform cursor-pointer" 
                 style="background: ${p.color}" 
                 data-color="${p.color}" 
                 data-type="bg"
@@ -404,7 +386,7 @@ function renderColorPresets() {
     });
 
     primaryPresetsContainer.innerHTML = primaryPresets.slice(0, 8).map(p => `
-        <button class="color-preset w-8 h-8 rounded-lg border-2 border-white shadow-sm hover:scale-110 transition-transform" 
+        <button class="color-preset w-8 h-8 rounded-lg border-2 border-white shadow-sm hover:scale-110 transition-transform cursor-pointer" 
                 style="background: ${p.color}" 
                 data-color="${p.color}" 
                 data-type="primary"
@@ -423,7 +405,7 @@ function renderSocialsEditor() {
             </select>
             <input type="text" class="social-url flex-1 bg-white text-gray-800 border border-gray-300 rounded p-1.5 text-xs" value="${social.url}" placeholder="URL" data-index="${index}">
             <input type="color" class="social-color w-8 h-8 rounded cursor-pointer" value="${social.color}" data-index="${index}">
-            <button class="delete-social p-1 text-red-500 hover:text-red-600" data-index="${index}">
+            <button class="delete-social p-1 text-red-500 hover:text-red-600 cursor-pointer" data-index="${index}">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
             </button>
         </div>
@@ -438,8 +420,8 @@ function renderProjectsEditor() {
             <input type="text" class="project-link w-full bg-white text-gray-800 border border-gray-300 rounded p-2 text-sm" value="${project.link || ''}" placeholder="项目链接" data-index="${index}">
             <div class="flex items-center gap-2">
                 <img src="${project.image}" class="w-12 h-12 rounded object-cover">
-                <input type="file" class="project-image flex-1 text-xs" accept="image/*" data-index="${index}">
-                <button class="delete-project p-1.5 text-red-500 hover:text-red-600 rounded hover:bg-red-50" data-index="${index}">
+                <input type="file" class="project-image flex-1 text-xs cursor-pointer" accept="image/*" data-index="${index}">
+                <button class="delete-project p-1.5 text-red-500 hover:text-red-600 rounded hover:bg-red-50 cursor-pointer" data-index="${index}">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                 </button>
             </div>
@@ -536,12 +518,7 @@ async function getFileSha(path) {
 }
 
 async function uploadToGitHub(path, content, message) {
-    // Always get fresh SHA
     const sha = await getFileSha(path);
-
-    if (!sha) {
-        console.warn('Could not get SHA, file may not exist yet');
-    }
 
     const body = {
         message: message,
@@ -617,16 +594,16 @@ async function uploadImageToGitHub(file, fileName) {
 
 async function saveToGitHub() {
     if (!isTokenVerified || !githubToken) {
-        showToast('请先验证 GitHub Token');
+        showToast('请先验证 GitHub Token', 'error');
         return;
     }
 
-    // Update data from forms
     updateProfileFromForm();
     updateSocialsFromForm();
     updateProjectsFromForm();
 
     const saveBtn = document.getElementById('save-btn');
+    const originalText = saveBtn.innerHTML;
     saveBtn.disabled = true;
     saveBtn.innerHTML = '<svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> 保存中...';
 
@@ -634,27 +611,27 @@ async function saveToGitHub() {
         const jsonContent = JSON.stringify(appData, null, 2);
         await uploadToGitHub('data.json', jsonContent, 'Update data.json via CMS');
 
-        showToast('保存成功！');
+        showToast('保存成功！', 'success');
         renderPage();
     } catch (error) {
         console.error('Save failed:', error);
-        showToast('保存失败: ' + error.message);
+        showToast('保存失败: ' + error.message, 'error');
     } finally {
         saveBtn.disabled = false;
-        saveBtn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg> 保存到 GitHub';
+        saveBtn.innerHTML = originalText;
     }
 }
 
 async function changePassword() {
     const newPassword = document.getElementById('new-password').value;
     if (!newPassword || newPassword.length < 4) {
-        showToast('密码至少需要 4 位');
+        showToast('密码至少需要 4 位', 'error');
         return;
     }
 
     appData.admin.passwordHash = await sha256(newPassword);
     document.getElementById('new-password').value = '';
-    showToast('密码已更新，请保存到 GitHub');
+    showToast('密码已更新，请保存到 GitHub', 'success');
 }
 
 // ============================================
@@ -664,10 +641,10 @@ async function changePassword() {
 document.addEventListener('DOMContentLoaded', () => {
     loadData();
     checkAdminAccess();
-    setupSecretTrigger();
 
     // Admin Toggle
     document.getElementById('admin-toggle').addEventListener('click', showLoginModal);
+    document.getElementById('footer-admin-link').addEventListener('click', showLoginModal);
 
     // Login Modal
     document.getElementById('login-submit').addEventListener('click', attemptLogin);
@@ -682,12 +659,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Verify Token
     document.getElementById('verify-token-btn').addEventListener('click', verifyToken);
+    document.getElementById('reset-token-btn').addEventListener('click', resetToken);
 
     // Theme buttons
     document.querySelectorAll('.theme-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             appData.theme.style = btn.dataset.style;
-            // Set default bg for theme
             if (btn.dataset.style === 'glass' && appData.theme.bgColor === '#F5EFEA') {
                 appData.theme.bgColor = '#667eea';
                 document.getElementById('bg-color').value = '#667eea';
@@ -768,20 +745,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const file = e.target.files[0];
         if (!file) return;
 
-        if (!githubToken) {
-            showToast('请先验证 GitHub Token');
+        if (!isTokenVerified || !githubToken) {
+            showToast('请先验证 GitHub Token', 'error');
             return;
         }
 
-        showToast('上传头像中...');
+        showToast('上传头像中...', 'info');
         try {
             const fileName = `avatar-${Date.now()}.${file.name.split('.').pop()}`;
             const url = await uploadImageToGitHub(file, fileName);
             appData.profile.avatar = url;
             document.getElementById('avatar').src = url;
-            showToast('头像上传成功');
+            showToast('头像上传成功', 'success');
         } catch (error) {
-            showToast('头像上传失败: ' + error.message);
+            showToast('头像上传失败: ' + error.message, 'error');
         }
     });
 
@@ -792,20 +769,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const index = parseInt(e.target.dataset.index);
             if (!file) return;
 
-            if (!githubToken) {
-                showToast('请先验证 GitHub Token');
+            if (!isTokenVerified || !githubToken) {
+                showToast('请先验证 GitHub Token', 'error');
                 return;
             }
 
-            showToast('上传图片中...');
+            showToast('上传图片中...', 'info');
             try {
                 const fileName = `project-${Date.now()}.${file.name.split('.').pop()}`;
                 const url = await uploadImageToGitHub(file, fileName);
                 appData.projects[index].image = url;
                 renderProjectsEditor();
-                showToast('图片上传成功');
+                showToast('图片上传成功', 'success');
             } catch (error) {
-                showToast('图片上传失败: ' + error.message);
+                showToast('图片上传失败: ' + error.message, 'error');
             }
         }
     });
