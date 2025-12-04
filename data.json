@@ -1,67 +1,67 @@
 {
-    "profile": {
-        "name": "Sai Studio",
-        "title": "Coming Soon",
-        "avatar": "https://raw.githubusercontent.com/caisiyang/bio/main/images/avatar-1764869801386.jpg",
-        "contactText": "Contact",
-        "contactUrl": "mailto:sai@saaaai.com"
+  "profile": {
+    "name": "Sai Studio",
+    "title": "Coming Soon",
+    "avatar": "https://raw.githubusercontent.com/caisiyang/bio/main/images/avatar-1764869801386.jpg",
+    "contactText": "Contact",
+    "contactUrl": "mailto:sai@saaaai.com"
+  },
+  "socials": [
+    {
+      "id": "4",
+      "platform": "email",
+      "url": "mailto:sai@saaaai.com",
+      "color": "#ea4335",
+      "label": "邮箱"
     },
-    "socials": [
-        {
-            "id": "4",
-            "platform": "email",
-            "url": "mailto:sai@saaaai.com",
-            "color": "#ea4335",
-            "label": "邮箱"
-        },
-        {
-            "id": "5",
-            "platform": "github",
-            "url": "#",
-            "color": "#333333",
-            "label": "GitHub"
-        },
-        {
-            "id": "7",
-            "platform": "web",
-            "url": "#",
-            "color": "#4285f4",
-            "label": "网站"
-        },
-        {
-            "id": "mirpv4shpd4b5nn54",
-            "platform": "wechat",
-            "url": "#",
-            "color": "#07c160",
-            "label": "微信"
-        }
-    ],
-    "projects": [
-        {
-            "id": "p2",
-            "title": "Coming Soon",
-            "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuAySn5NrEXbkj_y4towf9Xe7HXMihJxnO4qK6ktOfPsWwaht3BIvg8bTKF95DP3SuFCjITn6zFtFJgHXKHXnXm9m4yZMPHaK6o4xl4btAwlPSZGiq6-zu0U9OCoEqriNk6ogZ0sQ7bNAwlOLz_xtng_YSUHr_HEGkQK0yavRNIxHevcRMrBDqaCstFwKNmmjOJMm5Qj_qSImE3Vyk8MbLgWXTDnYCtqsJv3Z6BaqLaS1C2QoDaNusZOFBArJ-Wr0t_SRC4HRv0XbF0",
-            "link": "#"
-        },
-        {
-            "id": "mirpwoncpxzhbf8e8",
-            "title": "New Project",
-            "image": "https://via.placeholder.com/300",
-            "link": "#"
-        },
-        {
-            "id": "mirpwq329mko7tq67",
-            "title": "New Project",
-            "image": "https://via.placeholder.com/300",
-            "link": "#"
-        }
-    ],
-    "theme": {
-        "style": "default",
-        "primaryColor": "#b0806d",
-        "bgColor": "#F5EFEA"
+    {
+      "id": "5",
+      "platform": "github",
+      "url": "#",
+      "color": "#333333",
+      "label": "GitHub"
     },
-    "admin": {
-        "passwordHash": "2be4e33aa3e21f6ff7ad144f8fd58228a1cce3b50340b4805ff0c63480eec488"
+    {
+      "id": "7",
+      "platform": "web",
+      "url": "#",
+      "color": "#4285f4",
+      "label": "网站"
+    },
+    {
+      "id": "mirpv4shpd4b5nn54",
+      "platform": "wechat",
+      "url": "#",
+      "color": "#07c160",
+      "label": "微信"
     }
+  ],
+  "projects": [
+    {
+      "id": "p2",
+      "title": "Coming Soon",
+      "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuAySn5NrEXbkj_y4towf9Xe7HXMihJxnO4qK6ktOfPsWwaht3BIvg8bTKF95DP3SuFCjITn6zFtFJgHXKHXnXm9m4yZMPHaK6o4xl4btAwlPSZGiq6-zu0U9OCoEqriNk6ogZ0sQ7bNAwlOLz_xtng_YSUHr_HEGkQK0yavRNIxHevcRMrBDqaCstFwKNmmjOJMm5Qj_qSImE3Vyk8MbLgWXTDnYCtqsJv3Z6BaqLaS1C2QoDaNusZOFBArJ-Wr0t_SRC4HRv0XbF0",
+      "link": "#"
+    },
+    {
+      "id": "mirpwoncpxzhbf8e8",
+      "title": "New Project",
+      "image": "https://via.placeholder.com/300",
+      "link": "#"
+    },
+    {
+      "id": "mirpwq329mko7tq67",
+      "title": "New Project",
+      "image": "https://via.placeholder.com/300",
+      "link": "#"
+    }
+  ],
+  "theme": {
+    "style": "default",
+    "primaryColor": "#b0806d",
+    "bgColor": "#F5EFEA"
+  },
+  "admin": {
+    "passwordHash": "2be4e33aa3e21f6ff7ad144f8fd58228a1cce3b50340b4805ff0c63480eec488"
+  }
 }
