@@ -49,6 +49,7 @@ function getIconSvg(platform) {
         youtube: '<path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>',
         web: '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>',
         medium: '<path d="M13.54 12a6.8 6.8 0 01-6.77 6.82A6.8 6.8 0 010 12a6.8 6.8 0 016.77-6.82A6.8 6.8 0 0113.54 12zM20.96 12c0 3.54-1.51 6.42-3.38 6.42-1.87 0-3.39-2.88-3.39-6.42s1.52-6.42 3.39-6.42 3.38 2.88 3.38 6.42M24 12c0 3.17-.53 5.75-1.19 5.75-.66 0-1.19-2.58-1.19-5.75s.53-5.75 1.19-5.75C23.47 6.25 24 8.83 24 12z"/>',
+        wechat: '<path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 01.213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 00.167-.054l1.903-1.114a.864.864 0 01.717-.098 10.16 10.16 0 002.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-4.972 1.932-6.446 1.703-1.415 3.882-1.98 5.853-1.838-.576-3.583-4.196-6.348-8.596-6.348zM5.785 5.991c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 01-1.162 1.178A1.17 1.17 0 014.623 7.17c0-.651.52-1.18 1.162-1.18zm5.813 0c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 01-1.162 1.178 1.17 1.17 0 01-1.162-1.178c0-.651.52-1.18 1.162-1.18zm5.34 2.867c-1.797-.052-3.746.512-5.28 1.786-1.72 1.428-2.687 3.72-1.78 6.22.942 2.453 3.666 4.229 6.884 4.229.826 0 1.622-.12 2.361-.336a.722.722 0 01.598.082l1.584.926a.272.272 0 00.139.045c.133 0 .241-.108.241-.243 0-.06-.023-.12-.038-.177l-.327-1.233a.582.582 0 01-.023-.156.49.49 0 01.201-.398C23.024 18.48 24 16.82 24 14.98c0-3.21-2.931-5.837-6.656-6.088V8.89l-.407-.03zm-2.53 3.274c.535 0 .969.44.969.982a.976.976 0 01-.969.983.976.976 0 01-.969-.983c0-.542.434-.982.97-.982zm4.844 0c.535 0 .969.44.969.982a.976.976 0 01-.969.983.976.976 0 01-.969-.983c0-.542.434-.982.969-.982z"/>',
     };
     return `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">${icons[platform] || icons.web}</svg>`;
 }
@@ -133,15 +134,23 @@ function checkAdminAccess() {
     if (urlParams.get('admin') === 'true') {
         document.getElementById('admin-toggle').classList.remove('hidden');
     }
+
+    // Check if already logged in (no password needed after first login)
+    if (localStorage.getItem('admin_logged_in') === 'true') {
+        isAdminMode = true;
+    }
 }
 
-// Secret trigger: click copyright 5 times within 2 seconds
+// Secret trigger: click/tap copyright 5 times within 2 seconds
 function setupSecretTrigger() {
     const copyright = document.getElementById('copyright');
     copyright.style.cursor = 'default';
     copyright.style.userSelect = 'none';
+    copyright.style.webkitUserSelect = 'none';
+    copyright.style.webkitTapHighlightColor = 'transparent';
 
-    copyright.addEventListener('click', () => {
+    const handleTrigger = (e) => {
+        e.preventDefault();
         secretClickCount++;
 
         // Reset timer on each click
@@ -160,10 +169,20 @@ function setupSecretTrigger() {
         secretClickTimer = setTimeout(() => {
             secretClickCount = 0;
         }, 2000);
-    });
+    };
+
+    // Support both mouse and touch
+    copyright.addEventListener('click', handleTrigger);
+    copyright.addEventListener('touchend', handleTrigger);
 }
 
 function showLoginModal() {
+    // If already logged in, skip password
+    if (localStorage.getItem('admin_logged_in') === 'true') {
+        isAdminMode = true;
+        openAdminPanel();
+        return;
+    }
     document.getElementById('login-modal').classList.remove('hidden');
     document.getElementById('login-password').focus();
 }
@@ -180,6 +199,8 @@ async function attemptLogin() {
 
     if (hash === appData.admin.passwordHash) {
         isAdminMode = true;
+        // Remember login state
+        localStorage.setItem('admin_logged_in', 'true');
         hideLoginModal();
         openAdminPanel();
         showToast('登录成功');
@@ -199,6 +220,15 @@ async function attemptLogin() {
 function openAdminPanel() {
     document.getElementById('admin-panel').classList.remove('hidden');
     document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
+
+    // Load saved token if not already loaded
+    const savedToken = localStorage.getItem('github_token');
+    if (savedToken && !githubToken) {
+        githubToken = savedToken;
+        document.getElementById('github-token').value = savedToken;
+        document.getElementById('remember-token').checked = true;
+    }
+
     populateEditors();
 }
 
@@ -232,12 +262,12 @@ function renderSocialsEditor() {
     const container = document.getElementById('socials-editor');
     container.innerHTML = appData.socials.map((social, index) => `
         <div class="flex items-center gap-2 p-2 bg-white/30 rounded-lg" data-id="${social.id}">
-            <select class="social-platform flex-shrink-0 bg-transparent text-sm p-1 rounded border border-white/50" data-index="${index}">
-                ${['instagram', 'linkedin', 'twitter', 'email', 'github', 'youtube', 'web', 'medium'].map(p =>
+            <select class="social-platform flex-shrink-0 bg-white text-gray-800 text-sm p-1 rounded border border-gray-300" data-index="${index}">
+                ${['instagram', 'linkedin', 'twitter', 'email', 'github', 'youtube', 'web', 'medium', 'wechat'].map(p =>
         `<option value="${p}" ${p === social.platform ? 'selected' : ''}>${p}</option>`
     ).join('')}
             </select>
-            <input type="text" class="social-url flex-1 bg-white/50 border border-white rounded p-1.5 text-xs" value="${social.url}" placeholder="URL" data-index="${index}">
+            <input type="text" class="social-url flex-1 bg-white text-gray-800 border border-gray-300 rounded p-1.5 text-xs" value="${social.url}" placeholder="URL" data-index="${index}">
             <input type="color" class="social-color w-8 h-8 rounded cursor-pointer" value="${social.color}" data-index="${index}">
             <button class="delete-social p-1 text-red-500 hover:text-red-600" data-index="${index}">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
@@ -250,8 +280,8 @@ function renderProjectsEditor() {
     const container = document.getElementById('projects-editor');
     container.innerHTML = appData.projects.map((project, index) => `
         <div class="p-3 bg-white/30 rounded-lg space-y-2" data-id="${project.id}">
-            <input type="text" class="project-title w-full bg-white/50 border border-white rounded p-2 text-sm" value="${project.title}" placeholder="项目名称" data-index="${index}">
-            <input type="text" class="project-link w-full bg-white/50 border border-white rounded p-2 text-sm" value="${project.link || ''}" placeholder="项目链接" data-index="${index}">
+            <input type="text" class="project-title w-full bg-white text-gray-800 border border-gray-300 rounded p-2 text-sm" value="${project.title}" placeholder="项目名称" data-index="${index}">
+            <input type="text" class="project-link w-full bg-white text-gray-800 border border-gray-300 rounded p-2 text-sm" value="${project.link || ''}" placeholder="项目链接" data-index="${index}">
             <div class="flex items-center gap-2">
                 <img src="${project.image}" class="w-12 h-12 rounded object-cover">
                 <input type="file" class="project-image flex-1 text-xs" accept="image/*" data-index="${index}">
@@ -331,10 +361,12 @@ function deleteProject(index) {
 
 async function getFileSha(path) {
     try {
-        const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${path}?ref=${GITHUB_BRANCH}`, {
+        // Add timestamp to prevent browser caching
+        const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${path}?ref=${GITHUB_BRANCH}&t=${Date.now()}`, {
             headers: {
                 'Authorization': `token ${githubToken}`,
-                'Accept': 'application/vnd.github.v3+json'
+                'Accept': 'application/vnd.github.v3+json',
+                'Cache-Control': 'no-cache'
             }
         });
         if (response.ok) {

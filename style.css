@@ -122,6 +122,59 @@
 }
 
 /* ============================================
+   Admin Panel - Override glass theme
+   ============================================ */
+
+#admin-panel {
+    /* Always use light theme for admin panel */
+}
+
+#admin-panel .neu-card-inner {
+    background: rgba(255, 255, 255, 0.5) !important;
+}
+
+#admin-panel h2,
+#admin-panel h3,
+#admin-panel label,
+#admin-panel p,
+#admin-panel span {
+    color: #605652 !important;
+}
+
+#admin-panel .text-text-main {
+    color: #605652 !important;
+}
+
+#admin-panel .text-text-sub {
+    color: #9E948F !important;
+}
+
+/* Ensure form inputs are always readable */
+#admin-panel input[type="text"],
+#admin-panel input[type="password"],
+#admin-panel select {
+    background: white !important;
+    color: #333 !important;
+    border: 1px solid #ddd !important;
+}
+
+#admin-panel input[type="text"]::placeholder,
+#admin-panel input[type="password"]::placeholder {
+    color: #999 !important;
+}
+
+/* Theme buttons in admin panel */
+#admin-panel .theme-btn {
+    background: rgba(255, 255, 255, 0.5) !important;
+    color: #605652 !important;
+    border: 1px solid #ddd !important;
+}
+
+#admin-panel .theme-btn:hover {
+    background: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* ============================================
    Animations
    ============================================ */
 
