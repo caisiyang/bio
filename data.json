@@ -47,9 +47,9 @@
     }
   ],
   "theme": {
-    "style": "glass",
+    "style": "default",
     "primaryColor": "#b0806d",
-    "bgColor": "#a8edea"
+    "bgColor": "#F5EFEA"
   },
   "admin": {
     "passwordHash": "2be4e33aa3e21f6ff7ad144f8fd58228a1cce3b50340b4805ff0c63480eec488"
