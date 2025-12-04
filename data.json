@@ -1,9 +1,9 @@
 {
   "profile": {
     "name": "Sai Studio",
-    "title": "Coming Soon",
+    "title": "Sai Studio - All Made by Ai",
     "avatar": "https://raw.githubusercontent.com/caisiyang/bio/main/images/avatar-1764869801386.jpg",
-    "contactText": "Contact",
+    "contactText": "Contact E-mail",
     "contactUrl": "mailto:sai@saaaai.com"
   },
   "socials": [
@@ -15,9 +15,9 @@
     },
     {
       "id": "5",
-      "platform": "github",
-      "url": "#",
-      "color": "#333333"
+      "platform": "wechat",
+      "url": "a16z88",
+      "color": "#20df59"
     },
     {
       "id": "7",
@@ -35,9 +35,9 @@
   "projects": [
     {
       "id": "p2",
-      "title": "Coming Soon",
+      "title": "从日本看中国",
       "image": "https://raw.githubusercontent.com/caisiyang/bio/main/images/project-1764874297029.png",
-      "link": "#"
+      "link": "cn.saaaai.com"
     },
     {
       "id": "mirpwoncpxzhbf8e8",
