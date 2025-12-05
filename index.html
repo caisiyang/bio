@@ -123,48 +123,50 @@
 
         <!-- Panel Container -->
         <div
-            class="absolute right-0 top-0 h-full w-full max-w-2xl bg-[#F5EFEA] shadow-2xl flex transform transition-transform duration-300">
+            class="absolute right-0 top-0 h-full w-full sm:max-w-2xl bg-[#F5EFEA] shadow-2xl flex flex-col sm:flex-row transform transition-transform duration-300">
 
             <!-- Sidebar Menu -->
-            <div class="w-16 sm:w-48 bg-white/50 border-r border-gray-200/50 flex flex-col pt-4 pb-4">
+            <div
+                class="w-full h-16 sm:w-48 sm:h-full bg-white/50 border-t sm:border-t-0 sm:border-r border-gray-200/50 flex flex-row sm:flex-col items-center sm:items-stretch justify-between pt-0 pb-0 sm:pt-4 sm:pb-4 order-last sm:order-first z-10 shrink-0">
                 <div class="px-4 mb-6 hidden sm:block">
                     <h2 class="text-lg font-bold text-gray-800">设置</h2>
                 </div>
 
-                <nav class="flex-1 space-y-1 px-2">
+                <nav
+                    class="flex-1 flex flex-row sm:flex-col justify-around sm:justify-start space-x-0 sm:space-y-1 px-1 sm:px-2 h-full sm:h-auto items-center sm:items-stretch">
                     <button data-tab="profile"
-                        class="admin-tab-btn w-full flex items-center gap-3 px-3 py-3 text-sm font-medium rounded-lg text-gray-600 hover:bg-white/80 hover:text-blue-600 transition-colors active">
-                        <i class="fas fa-user w-5 text-center"></i>
-                        <span class="hidden sm:inline">个人信息</span>
+                        class="admin-tab-btn flex-1 sm:flex-none flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-1 sm:gap-3 px-1 sm:px-3 py-2 sm:py-3 text-[10px] sm:text-sm font-medium rounded-lg text-gray-600 hover:bg-white/80 hover:text-blue-600 transition-colors active">
+                        <i class="fas fa-user w-5 text-center text-base sm:text-sm"></i>
+                        <span class="block sm:inline">信息</span>
                     </button>
                     <button data-tab="socials"
-                        class="admin-tab-btn w-full flex items-center gap-3 px-3 py-3 text-sm font-medium rounded-lg text-gray-600 hover:bg-white/80 hover:text-blue-600 transition-colors">
-                        <i class="fas fa-share-alt w-5 text-center"></i>
-                        <span class="hidden sm:inline">社交链接</span>
+                        class="admin-tab-btn flex-1 sm:flex-none flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-1 sm:gap-3 px-1 sm:px-3 py-2 sm:py-3 text-[10px] sm:text-sm font-medium rounded-lg text-gray-600 hover:bg-white/80 hover:text-blue-600 transition-colors">
+                        <i class="fas fa-share-alt w-5 text-center text-base sm:text-sm"></i>
+                        <span class="block sm:inline">社交</span>
                     </button>
                     <button data-tab="projects"
-                        class="admin-tab-btn w-full flex items-center gap-3 px-3 py-3 text-sm font-medium rounded-lg text-gray-600 hover:bg-white/80 hover:text-blue-600 transition-colors">
-                        <i class="fas fa-folder w-5 text-center"></i>
-                        <span class="hidden sm:inline">项目管理</span>
+                        class="admin-tab-btn flex-1 sm:flex-none flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-1 sm:gap-3 px-1 sm:px-3 py-2 sm:py-3 text-[10px] sm:text-sm font-medium rounded-lg text-gray-600 hover:bg-white/80 hover:text-blue-600 transition-colors">
+                        <i class="fas fa-folder w-5 text-center text-base sm:text-sm"></i>
+                        <span class="block sm:inline">项目</span>
                     </button>
                     <button data-tab="sections"
-                        class="admin-tab-btn w-full flex items-center gap-3 px-3 py-3 text-sm font-medium rounded-lg text-gray-600 hover:bg-white/80 hover:text-blue-600 transition-colors">
-                        <i class="fas fa-heading w-5 text-center"></i>
-                        <span class="hidden sm:inline">区域标题</span>
+                        class="admin-tab-btn flex-1 sm:flex-none flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-1 sm:gap-3 px-1 sm:px-3 py-2 sm:py-3 text-[10px] sm:text-sm font-medium rounded-lg text-gray-600 hover:bg-white/80 hover:text-blue-600 transition-colors">
+                        <i class="fas fa-heading w-5 text-center text-base sm:text-sm"></i>
+                        <span class="block sm:inline">排版</span>
                     </button>
                     <button data-tab="appearance"
-                        class="admin-tab-btn w-full flex items-center gap-3 px-3 py-3 text-sm font-medium rounded-lg text-gray-600 hover:bg-white/80 hover:text-blue-600 transition-colors">
-                        <i class="fas fa-paint-brush w-5 text-center"></i>
-                        <span class="hidden sm:inline">外观设置</span>
+                        class="admin-tab-btn flex-1 sm:flex-none flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-1 sm:gap-3 px-1 sm:px-3 py-2 sm:py-3 text-[10px] sm:text-sm font-medium rounded-lg text-gray-600 hover:bg-white/80 hover:text-blue-600 transition-colors">
+                        <i class="fas fa-paint-brush w-5 text-center text-base sm:text-sm"></i>
+                        <span class="block sm:inline">外观</span>
                     </button>
                     <button data-tab="system"
-                        class="admin-tab-btn w-full flex items-center gap-3 px-3 py-3 text-sm font-medium rounded-lg text-gray-600 hover:bg-white/80 hover:text-blue-600 transition-colors">
-                        <i class="fas fa-cog w-5 text-center"></i>
-                        <span class="hidden sm:inline">系统设置</span>
+                        class="admin-tab-btn flex-1 sm:flex-none flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-1 sm:gap-3 px-1 sm:px-3 py-2 sm:py-3 text-[10px] sm:text-sm font-medium rounded-lg text-gray-600 hover:bg-white/80 hover:text-blue-600 transition-colors">
+                        <i class="fas fa-cog w-5 text-center text-base sm:text-sm"></i>
+                        <span class="block sm:inline">系统</span>
                     </button>
                 </nav>
 
-                <div class="px-2 mt-auto">
+                <div class="px-2 mt-auto hidden sm:block">
                     <button id="close-admin"
                         class="w-full flex items-center gap-3 px-3 py-3 text-sm font-medium rounded-lg text-gray-500 hover:bg-red-50 hover:text-red-600 transition-colors cursor-pointer">
                         <i class="fas fa-sign-out-alt w-5 text-center"></i>
@@ -174,8 +176,17 @@
             </div>
 
             <!-- Content Area -->
-            <div class="flex-1 flex flex-col h-full overflow-hidden bg-[#F5EFEA]">
-                <div class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+            <div class="flex-1 flex flex-col h-full overflow-hidden bg-[#F5EFEA] relative">
+                <!-- Mobile Header with Close Button -->
+                <div
+                    class="sm:hidden h-12 flex items-center justify-between px-4 bg-white/50 border-b border-gray-200/50 shrink-0">
+                    <h2 class="font-bold text-gray-800">设置</h2>
+                    <button onclick="document.getElementById('close-admin').click()" class="text-gray-500 p-2">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 pb-20 sm:pb-6">
 
                     <!-- Tab: Profile -->
                     <div id="tab-profile" class="admin-tab-content space-y-6">

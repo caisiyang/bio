@@ -624,36 +624,23 @@ function initSortable() {
 }
 
 function showLoginModal() {
-    if (localStorage.getItem('admin_logged_in') === 'true') {
-        openAdminPanel();
-        return;
-    }
-    document.getElementById('login-modal').classList.remove('hidden');
-    document.getElementById('login-password').focus();
+    isAdminMode = true;
+    localStorage.setItem('admin_logged_in', 'true');
+    openAdminPanel();
+    showToast('Admin Mode Activated', 'success');
+    document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
+    initSortable();
 }
 
 function hideLoginModal() {
+    // Functionality removed as modal is no longer used, but kept empty/stubbed if referenced elsewhere, 
+    // or can be safe to delete if we are sure. For now, let's just make it do nothing or remove it if not needed.
+    // Checking references: called by login-cancel click.
     document.getElementById('login-modal').classList.add('hidden');
-    document.getElementById('login-password').value = '';
-    document.getElementById('login-error').classList.add('hidden');
 }
 
-async function attemptLogin() {
-    const password = document.getElementById('login-password').value;
-    const hash = await sha256(password);
+// attemptLogin function removed
 
-    if (hash === appData.admin.passwordHash) {
-        isAdminMode = true;
-        localStorage.setItem('admin_logged_in', 'true');
-        hideLoginModal();
-        openAdminPanel();
-        showToast('登录成功', 'success');
-        document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
-        initSortable();
-    } else {
-        document.getElementById('login-error').classList.remove('hidden');
-    }
-}
 
 function openAdminPanel() {
     document.getElementById('admin-panel').classList.remove('hidden');
@@ -1287,11 +1274,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Login
-    document.getElementById('login-submit').addEventListener('click', attemptLogin);
-    document.getElementById('login-cancel').addEventListener('click', hideLoginModal);
-    document.getElementById('login-password').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') attemptLogin();
-    });
+    // Login Listeners - Removed
+    // document.getElementById('login-submit').addEventListener('click', attemptLogin);
+    // document.getElementById('login-cancel').addEventListener('click', hideLoginModal);
+    // document.getElementById('login-password').addEventListener('keypress', (e) => {
+    //     if (e.key === 'Enter') attemptLogin();
+    // });
 
     // Token
     document.getElementById('verify-token-btn').addEventListener('click', verifyToken);
@@ -1424,17 +1412,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Save Button (Now saves to Gist!)
     document.getElementById('save-btn').addEventListener('click', saveToGist);
 
-    // Password Change
-    document.getElementById('change-password-btn').addEventListener('click', async () => {
-        const newPassword = document.getElementById('new-password').value;
-        if (!newPassword || newPassword.length < 4) {
-            showToast('密码至少需要 4 位', 'error');
-            return;
-        }
-        appData.admin.passwordHash = await sha256(newPassword);
-        document.getElementById('new-password').value = '';
-        showToast('密码已更新，请保存到 Gist', 'success');
-    });
+    // Password Change - Removed
+
 
     // Icon Picker Search
     document.getElementById('icon-search').addEventListener('input', (e) => {
