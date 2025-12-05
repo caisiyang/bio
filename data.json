@@ -13,6 +13,7 @@
       "url": "mailto:sai@saaaai.com",
       "color": "#ea4335",
       "label": "邮箱",
+      "newTab": true,
       "icon": "fas fa-envelope"
     },
     {
@@ -21,22 +22,25 @@
       "url": "#",
       "color": "#333333",
       "label": "GitHub",
+      "newTab": true,
       "icon": "fab fa-github"
     },
     {
       "id": "7",
       "platform": "web",
       "url": "#",
-      "color": "#4285f4",
+      "color": "#739cde",
       "label": "网站",
+      "newTab": true,
       "icon": "fas fa-globe"
     },
     {
       "id": "mirpv4shpd4b5nn54",
       "platform": "wechat",
       "url": "#",
-      "color": "#07c160",
+      "color": "#3bce59",
       "label": "微信",
+      "newTab": true,
       "icon": "fab fa-weixin"
     }
   ],
@@ -46,21 +50,24 @@
       "title": "Coming Soon",
       "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuAySn5NrEXbkj_y4towf9Xe7HXMihJxnO4qK6ktOfPsWwaht3BIvg8bTKF95DP3SuFCjITn6zFtFJgHXKHXnXm9m4yZMPHaK6o4xl4btAwlPSZGiq6-zu0U9OCoEqriNk6ogZ0sQ7bNAwlOLz_xtng_YSUHr_HEGkQK0yavRNIxHevcRMrBDqaCstFwKNmmjOJMm5Qj_qSImE3Vyk8MbLgWXTDnYCtqsJv3Z6BaqLaS1C2QoDaNusZOFBArJ-Wr0t_SRC4HRv0XbF0",
       "link": "#",
-      "width": "1x1"
+      "width": "1x1",
+      "newTab": true
     },
     {
       "id": "mirpwoncpxzhbf8e8",
       "title": "New Project",
       "image": "https://via.placeholder.com/300",
       "link": "#",
-      "width": "1x1"
+      "width": "1x1",
+      "newTab": true
     },
     {
-      "id": "misdv13zka19ezfcy",
+      "id": "mirpwq329mko7tq67",
       "title": "New Project",
       "image": "https://via.placeholder.com/300",
       "link": "#",
-      "width": "2x1"
+      "width": "2x1",
+      "newTab": true
     }
   ],
   "theme": {
@@ -73,7 +80,5 @@
   "admin": {
     "passwordHash": "2be4e33aa3e21f6ff7ad144f8fd58228a1cce3b50340b4805ff0c63480eec488"
   },
-  "settings": {
-    "openNewTab": true
-  }
+  "settings": {}
 }
