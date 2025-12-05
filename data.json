@@ -24,16 +24,16 @@
   ],
   "projects": [
     {
-      "id": "p2",
-      "title": "从日本看中国",
-      "image": "https://raw.githubusercontent.com/caisiyang/bio/main/images/project-1764892943562.png",
-      "link": "https://cn.saaaai.com/"
-    },
-    {
       "id": "mirpwoncpxzhbf8e8",
       "title": "感谢微信打赏",
       "image": "https://raw.githubusercontent.com/caisiyang/bio/main/images/project-1764892960217.jpg",
       "link": "#"
+    },
+    {
+      "id": "misc31uyhh2uaax6p",
+      "title": "从日本看中国",
+      "image": "https://raw.githubusercontent.com/caisiyang/bio/main/images/project-1764907067501.png",
+      "link": "cn.saaaai.com"
     }
   ],
   "theme": {
