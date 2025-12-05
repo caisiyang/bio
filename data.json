@@ -25,8 +25,8 @@
   "projects": [
     {
       "id": "mirpwoncpxzhbf8e8",
-      "title": "感谢微信打赏",
-      "image": "https://raw.githubusercontent.com/caisiyang/bio/main/images/project-1764892960217.jpg",
+      "title": "模块化轻主页",
+      "image": "https://raw.githubusercontent.com/caisiyang/bio/main/images/project-1764908667882.png",
       "link": "#"
     },
     {
@@ -38,7 +38,7 @@
   ],
   "theme": {
     "style": "default",
-    "primaryColor": "#b0806d",
+    "primaryColor": "#605652",
     "bgColor": "#F5EFEA"
   },
   "admin": {
