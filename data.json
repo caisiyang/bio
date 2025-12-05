@@ -67,7 +67,7 @@
     "style": "default",
     "primaryColor": "#b0806d",
     "bgColor": "#F5EFEA",
-    "font": "serif",
+    "font": "sans",
     "fontSize": 16
   },
   "admin": {
