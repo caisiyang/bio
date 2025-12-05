@@ -1,6 +1,6 @@
 /**
  * Lightweight CMS - Main Script
- * Features: Data rendering, Admin panel, GitHub API integration, Theme switching
+ * Features: Data rendering, Admin panel, GitHub API integration, Theme switching, Real-time preview
  */
 
 // ============================================
@@ -11,7 +11,7 @@ let isAdminMode = false;
 let githubToken = null;
 let isTokenVerified = false;
 
-// GitHub Config - Change these if you rename your repo
+// GitHub Config
 const GITHUB_OWNER = 'caisiyang';
 const GITHUB_REPO_NAME = 'bio';
 const GITHUB_BRANCH = 'main';
@@ -20,20 +20,21 @@ const GITHUB_REPO = `${GITHUB_OWNER}/${GITHUB_REPO_NAME}`;
 // Default color presets
 const DEFAULT_BG_COLORS = [
     { color: '#F5EFEA', name: '默认奶茶' },
-    { color: '#667eea', name: '默认紫 (毛玻璃)' },
-    { color: '#1a1a2e', name: '深夜蓝' },
-    { color: '#f8f9fa', name: '纯白' },
-    { color: '#ffecd2', name: '暖橙' },
-    { color: '#a8edea', name: '薄荷' },
+    { color: '#ffffff', name: '纯白' },
+    { color: '#f3f4f6', name: '浅灰' },
+    { color: '#fff1f2', name: '浅粉' },
+    { color: '#ecfdf5', name: '薄荷' },
+    { color: '#eff6ff', name: '淡蓝' },
 ];
 
-const DEFAULT_PRIMARY_COLORS = [
-    { color: '#605652', name: '默认棕' },
-    { color: '#667eea', name: '紫罗兰' },
-    { color: '#f093fb', name: '浅粉' },
-    { color: '#4facfe', name: '天蓝' },
-    { color: '#43e97b', name: '翠绿' },
-    { color: '#fa709a', name: '桃红' },
+// Common Icons (FontAwesome)
+const COMMON_ICONS = [
+    'fas fa-envelope', 'fab fa-github', 'fab fa-twitter', 'fab fa-instagram',
+    'fab fa-linkedin', 'fab fa-youtube', 'fab fa-weixin', 'fas fa-globe',
+    'fab fa-medium', 'fab fa-tiktok', 'fab fa-discord', 'fab fa-telegram',
+    'fab fa-facebook', 'fab fa-whatsapp', 'fab fa-bilibili', 'fab fa-weibo',
+    'fas fa-link', 'fas fa-code', 'fas fa-pen', 'fas fa-camera',
+    'fas fa-music', 'fas fa-gamepad', 'fas fa-book', 'fas fa-coffee'
 ];
 
 // ============================================
@@ -59,28 +60,13 @@ function showToast(message, type = 'info', duration = 3000) {
     msgEl.textContent = message;
     iconEl.textContent = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
 
-    toast.classList.remove('hidden', 'opacity-0');
+    toast.classList.remove('hidden', 'opacity-0', 'translate-y-4');
 
     if (window.toastTimer) clearTimeout(window.toastTimer);
     window.toastTimer = setTimeout(() => {
-        toast.classList.add('opacity-0');
+        toast.classList.add('opacity-0', 'translate-y-4');
         setTimeout(() => toast.classList.add('hidden'), 300);
     }, duration);
-}
-
-function getIconSvg(platform) {
-    const icons = {
-        instagram: '<path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>',
-        linkedin: '<path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>',
-        twitter: '<path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>',
-        email: '<path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>',
-        github: '<path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>',
-        youtube: '<path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>',
-        web: '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>',
-        medium: '<path d="M13.54 12a6.8 6.8 0 01-6.77 6.82A6.8 6.8 0 010 12a6.8 6.8 0 016.77-6.82A6.8 6.8 0 0113.54 12zM20.96 12c0 3.54-1.51 6.42-3.38 6.42-1.87 0-3.39-2.88-3.39-6.42s1.52-6.42 3.39-6.42 3.38 2.88 3.38 6.42M24 12c0 3.17-.53 5.75-1.19 5.75-.66 0-1.19-2.58-1.19-5.75s.53-5.75 1.19-5.75C23.47 6.25 24 8.83 24 12z"/>',
-        wechat: '<path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 01.213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 00.167-.054l1.903-1.114a.864.864 0 01.717-.098 10.16 10.16 0 002.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-4.972 1.932-6.446 1.703-1.415 3.882-1.98 5.853-1.838-.576-3.583-4.196-6.348-8.596-6.348zM5.785 5.991c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 01-1.162 1.178A1.17 1.17 0 014.623 7.17c0-.651.52-1.18 1.162-1.18zm5.813 0c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 01-1.162 1.178 1.17 1.17 0 01-1.162-1.178c0-.651.52-1.18 1.162-1.18zm5.34 2.867c-1.797-.052-3.746.512-5.28 1.786-1.72 1.428-2.687 3.72-1.78 6.22.942 2.453 3.666 4.229 6.884 4.229.826 0 1.622-.12 2.361-.336a.722.722 0 01.598.082l1.584.926a.272.272 0 00.139.045c.133 0 .241-.108.241-.243 0-.06-.023-.12-.038-.177l-.327-1.233a.582.582 0 01-.023-.156.49.49 0 01.201-.398C23.024 18.48 24 16.82 24 14.98c0-3.21-2.931-5.837-6.656-6.088V8.89l-.407-.03zm-2.53 3.274c.535 0 .969.44.969.982a.976.976 0 01-.969.983.976.976 0 01-.969-.983c0-.542.434-.982.97-.982zm4.844 0c.535 0 .969.44.969.982a.976.976 0 01-.969.983.976.976 0 01-.969-.983c0-.542.434-.982.969-.982z"/>',
-    };
-    return `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">${icons[platform] || icons.web}</svg>`;
 }
 
 function getColorHistory(key) {
@@ -99,78 +85,205 @@ function saveColorToHistory(key, color) {
     localStorage.setItem(key, JSON.stringify(history));
 }
 
+function isValidLink(url) {
+    return url && url.trim() !== '' && url !== '#';
+}
+
 // ============================================
-// Data Loading & Rendering
+// Data Loading & Migration
 // ============================================
 
 async function loadData() {
     try {
         const response = await fetch('data.json?t=' + Date.now());
         appData = await response.json();
-
-        if (!appData.theme.bgColor) {
-            appData.theme.bgColor = appData.theme.style === 'glass' ? '#667eea' : '#F5EFEA';
-        }
+        migrateData(); // Ensure data structure is up to date
 
         renderPage();
         applyTheme();
+
+        // Initialize Admin UI if logged in
+        checkAdminAccess();
     } catch (error) {
         console.error('Failed to load data:', error);
         showToast('加载数据失败', 'error');
     }
 }
 
+function migrateData() {
+    // Ensure theme settings exist
+    if (!appData.theme) appData.theme = {};
+    if (!appData.theme.font) appData.theme.font = 'sans';
+    if (!appData.theme.fontSize) appData.theme.fontSize = 16;
+    if (!appData.theme.bgColor) appData.theme.bgColor = '#F5EFEA';
+
+    // Ensure settings exist
+    if (!appData.settings) appData.settings = {};
+
+    // Ensure projects have width and newTab
+    if (appData.projects) {
+        appData.projects.forEach(p => {
+            if (!p.width) p.width = '1x1';
+            if (typeof p.newTab === 'undefined') p.newTab = true;
+        });
+    }
+
+    // Ensure socials have icon class and newTab
+    if (appData.socials) {
+        appData.socials.forEach(s => {
+            if (typeof s.newTab === 'undefined') s.newTab = true;
+            if (!s.icon) {
+                // Map old platform names to FontAwesome
+                const map = {
+                    'github': 'fab fa-github',
+                    'twitter': 'fab fa-twitter',
+                    'instagram': 'fab fa-instagram',
+                    'linkedin': 'fab fa-linkedin',
+                    'youtube': 'fab fa-youtube',
+                    'email': 'fas fa-envelope',
+                    'web': 'fas fa-globe',
+                    'wechat': 'fab fa-weixin',
+                    'medium': 'fab fa-medium'
+                };
+                s.icon = map[s.platform] || 'fas fa-link';
+            }
+        });
+    }
+}
+
+// ============================================
+// Rendering
+// ============================================
+
 function renderPage() {
     if (!appData) return;
+    renderProfile();
+    renderSocials();
+    renderProjects();
+    renderFooter();
 
+    // Re-initialize Sortable if in admin mode
+    if (isAdminMode) {
+        initSortable();
+    }
+}
+
+function renderProfile() {
     document.getElementById('avatar').src = appData.profile.avatar;
     document.getElementById('profile-name').textContent = appData.profile.name;
     document.getElementById('profile-title').textContent = appData.profile.title;
     document.getElementById('contact-text').textContent = appData.profile.contactText;
-    document.getElementById('contact-link').href = appData.profile.contactUrl;
 
-    const socialsGrid = document.getElementById('socials-grid');
-    socialsGrid.innerHTML = appData.socials.map(social => `
-        <a href="${social.url}" target="_blank" rel="noopener noreferrer" class="block">
-            <div class="neu-button w-full aspect-square rounded-2xl flex flex-col items-center justify-center gap-1 p-2 hover:scale-105 transition-transform" style="color: ${social.color}">
-                ${getIconSvg(social.platform)}
-                ${social.label ? `<span class="text-[10px] font-medium text-text-sub truncate w-full text-center">${social.label}</span>` : ''}
-            </div>
-        </a>
-    `).join('');
+    const contactLink = document.getElementById('contact-link');
+    const url = appData.profile.contactUrl;
 
-    const projectsGrid = document.getElementById('projects-grid');
-    projectsGrid.innerHTML = appData.projects.map(project => `
-        <a href="${project.link || '#'}" target="_blank" rel="noopener noreferrer" class="block">
-            <div class="neu-card p-3 h-full flex flex-col transition-transform hover:-translate-y-1">
-                <div class="w-full aspect-square rounded-xl overflow-hidden mb-3 bg-gray-200">
-                    <img src="${project.image}" alt="${project.title}" class="w-full h-full object-cover" loading="lazy">
-                </div>
-                <h3 class="font-semibold text-xs text-text-main leading-tight mt-auto">${project.title}</h3>
-            </div>
-        </a>
-    `).join('');
-
-    document.getElementById('copyright').textContent = `© ${new Date().getFullYear()} ${appData.profile.name}`;
-
-    if (isAdminMode) {
-        populateEditors();
+    if (isValidLink(url)) {
+        contactLink.href = url;
+        contactLink.classList.remove('pointer-events-none', 'opacity-75');
+        contactLink.querySelector('button').classList.remove('cursor-default');
+        contactLink.target = '_blank';
+        contactLink.rel = 'noopener noreferrer';
+    } else {
+        contactLink.removeAttribute('href');
+        contactLink.removeAttribute('target');
+        contactLink.classList.add('pointer-events-none', 'opacity-75');
+        contactLink.querySelector('button').classList.add('cursor-default');
     }
+}
+
+function renderSocials() {
+    const socialsGrid = document.getElementById('socials-grid');
+    socialsGrid.innerHTML = appData.socials.map(social => {
+        const hasLink = isValidLink(social.url);
+        return `
+        <div class="social-item relative group" data-id="${social.id}">
+            <a ${hasLink ? `href="${social.url}"` : ''} 
+               ${hasLink && social.newTab ? 'target="_blank" rel="noopener noreferrer"' : ''} 
+               class="block h-full ${!hasLink ? 'cursor-default' : ''}">
+                <div class="neu-button w-full aspect-square rounded-2xl flex flex-col items-center justify-center gap-2 p-2 transition-transform ${hasLink ? 'hover:scale-105' : 'opacity-60'}" style="color: ${social.color}">
+                    <i class="${social.icon} text-2xl"></i>
+                    ${social.label ? `<span class="text-[10px] font-medium text-text-sub truncate w-full text-center">${social.label}</span>` : ''}
+                </div>
+            </a>
+            ${isAdminMode ? `
+            <div class="delete-btn-overlay" onclick="deleteSocial('${social.id}')">
+                <i class="fas fa-times"></i>
+            </div>
+            ` : ''}
+        </div>
+    `}).join('');
+}
+
+function renderProjects() {
+    const projectsGrid = document.getElementById('projects-grid');
+    projectsGrid.innerHTML = appData.projects.map(project => {
+        const hasLink = isValidLink(project.link);
+
+        // Calculate grid classes based on width
+        let gridClass = 'col-span-1';
+        let heightClass = 'aspect-square';
+
+        if (project.width === '2x1') {
+            gridClass = 'col-span-2';
+            heightClass = 'aspect-[2/1]';
+        } else if (project.width === '3x1') {
+            gridClass = 'col-span-2 sm:col-span-3';
+            heightClass = 'aspect-[3/1]';
+        } else if (project.width === '4x1') {
+            gridClass = 'col-span-2 sm:col-span-4';
+            heightClass = 'aspect-[4/1]';
+        } else if (project.width === '2x2') {
+            gridClass = 'col-span-2 row-span-2';
+            heightClass = 'aspect-square';
+        }
+
+        return `
+        <div class="project-item relative group ${gridClass}" data-id="${project.id}">
+            <a ${hasLink ? `href="${project.link}"` : ''} 
+               ${hasLink && project.newTab ? 'target="_blank" rel="noopener noreferrer"' : ''} 
+               class="block h-full ${!hasLink ? 'cursor-default' : ''}">
+                <div class="neu-card p-3 h-full flex flex-col transition-transform ${hasLink ? 'hover:-translate-y-1' : ''}">
+                    <div class="w-full ${heightClass} rounded-xl overflow-hidden mb-2 bg-gray-200 relative">
+                        <img src="${project.image}" alt="${project.title}" class="w-full h-full object-cover" loading="lazy">
+                    </div>
+                    <h3 class="font-semibold text-xs text-text-main leading-tight mt-auto truncate">${project.title}</h3>
+                </div>
+            </a>
+            ${isAdminMode ? `
+            <div class="delete-btn-overlay" onclick="deleteProject('${project.id}')">
+                <i class="fas fa-times"></i>
+            </div>
+            ` : ''}
+        </div>
+    `}).join('');
+}
+
+function renderFooter() {
+    document.getElementById('copyright').textContent = `© ${new Date().getFullYear()} ${appData.profile.name}`;
 }
 
 function applyTheme() {
     if (!appData) return;
 
-    const { style, primaryColor, bgColor } = appData.theme;
+    const { style, bgColor, font, fontSize } = appData.theme;
+
+    // Style & Background
     document.body.classList.remove('theme-default', 'theme-glass');
     document.body.classList.add(`theme-${style}`);
-    document.documentElement.style.setProperty('--primary-color', primaryColor);
 
     if (style === 'glass') {
-        document.body.style.background = `linear-gradient(135deg, ${bgColor} 0%, ${adjustColor(bgColor, -20)} 100%)`;
+        document.body.style.background = `linear-gradient(135deg, ${bgColor} 0%, ${adjustColor(bgColor, -40)} 100%)`;
     } else {
+        // Default theme enforces light mode
         document.body.style.background = bgColor;
     }
+
+    // Font Family
+    document.body.classList.remove('font-sans', 'font-serif');
+    document.body.classList.add(font === 'serif' ? 'font-serif' : 'font-sans');
+
+    // Font Size (apply to root for rem scaling or body)
+    document.documentElement.style.fontSize = `${fontSize}px`;
 }
 
 function adjustColor(color, amount) {
@@ -182,18 +295,17 @@ function adjustColor(color, amount) {
 }
 
 // ============================================
-// Admin Mode
+// Admin Mode & Logic
 // ============================================
 
 function checkAdminAccess() {
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('admin') === 'true') {
-        document.getElementById('admin-toggle').classList.remove('hidden');
-    }
-
-    if (localStorage.getItem('admin_logged_in') === 'true') {
+    if (urlParams.get('admin') === 'true' || localStorage.getItem('admin_logged_in') === 'true') {
         isAdminMode = true;
         document.getElementById('admin-toggle').classList.remove('hidden');
+        document.body.classList.add('admin-mode');
+        document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
+        initSortable();
     }
 
     if (localStorage.getItem('github_token_verified') === 'true') {
@@ -202,9 +314,46 @@ function checkAdminAccess() {
     }
 }
 
+function initSortable() {
+    // Socials Sortable
+    new Sortable(document.getElementById('socials-grid'), {
+        animation: 150,
+        ghostClass: 'sortable-ghost',
+        dragClass: 'sortable-drag',
+        delay: 100,
+        delayOnTouchOnly: true,
+        onEnd: function (evt) {
+            const newOrder = [];
+            document.querySelectorAll('#socials-grid .social-item').forEach(item => {
+                const id = item.dataset.id;
+                const social = appData.socials.find(s => s.id === id);
+                if (social) newOrder.push(social);
+            });
+            appData.socials = newOrder;
+        }
+    });
+
+    // Projects Sortable
+    new Sortable(document.getElementById('projects-grid'), {
+        animation: 150,
+        ghostClass: 'sortable-ghost',
+        dragClass: 'sortable-drag',
+        delay: 100,
+        delayOnTouchOnly: true,
+        onEnd: function (evt) {
+            const newOrder = [];
+            document.querySelectorAll('#projects-grid .project-item').forEach(item => {
+                const id = item.dataset.id;
+                const project = appData.projects.find(p => p.id === id);
+                if (project) newOrder.push(project);
+            });
+            appData.projects = newOrder;
+        }
+    });
+}
+
 function showLoginModal() {
     if (localStorage.getItem('admin_logged_in') === 'true') {
-        isAdminMode = true;
         openAdminPanel();
         return;
     }
@@ -228,6 +377,8 @@ async function attemptLogin() {
         hideLoginModal();
         openAdminPanel();
         showToast('登录成功', 'success');
+        document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
+        initSortable();
     } else {
         document.getElementById('login-error').classList.remove('hidden');
     }
@@ -235,17 +386,266 @@ async function attemptLogin() {
 
 function openAdminPanel() {
     document.getElementById('admin-panel').classList.remove('hidden');
-    document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
 
+    // Load Token
     const savedToken = localStorage.getItem('github_token');
     if (savedToken) {
         githubToken = savedToken;
         document.getElementById('github-token').value = savedToken;
     }
-
     updateTokenUI();
+
+    // Populate Editors
     populateEditors();
+
+    // Default to first tab
+    switchTab('profile');
 }
+
+function closeAdminPanel() {
+    document.getElementById('admin-panel').classList.add('hidden');
+}
+
+function switchTab(tabId) {
+    // Update Sidebar Buttons
+    document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+        if (btn.dataset.tab === tabId) {
+            btn.classList.add('bg-white', 'text-blue-600', 'shadow-sm');
+            btn.classList.remove('text-gray-600', 'hover:bg-white/80');
+        } else {
+            btn.classList.remove('bg-white', 'text-blue-600', 'shadow-sm');
+            btn.classList.add('text-gray-600', 'hover:bg-white/80');
+        }
+    });
+
+    // Show Content
+    document.querySelectorAll('.admin-tab-content').forEach(content => {
+        if (content.id === `tab-${tabId}`) {
+            content.classList.remove('hidden');
+        } else {
+            content.classList.add('hidden');
+        }
+    });
+}
+
+function populateEditors() {
+    // Profile
+    document.getElementById('edit-name').value = appData.profile.name;
+    document.getElementById('edit-title').value = appData.profile.title;
+    document.getElementById('edit-contact-text').value = appData.profile.contactText;
+    document.getElementById('edit-contact-url').value = appData.profile.contactUrl;
+
+    // Theme
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+        const isActive = btn.dataset.style === appData.theme.style;
+        btn.classList.toggle('ring-2', isActive);
+        btn.classList.toggle('ring-blue-500', isActive);
+    });
+
+    document.getElementById('bg-color').value = appData.theme.bgColor;
+    document.getElementById('bg-color-hex').textContent = appData.theme.bgColor;
+    renderColorPresets();
+
+    // Font
+    document.querySelectorAll('.font-btn').forEach(btn => {
+        const isActive = btn.dataset.font === appData.theme.font;
+        btn.classList.toggle('ring-2', isActive);
+        btn.classList.toggle('ring-blue-500', isActive);
+    });
+    document.getElementById('font-size-slider').value = appData.theme.fontSize;
+
+    // Lists
+    renderSocialsEditor();
+    renderProjectsEditor();
+}
+
+function renderColorPresets() {
+    const container = document.getElementById('bg-color-presets');
+    const history = getColorHistory('bg_color_history');
+    let presets = [...DEFAULT_BG_COLORS];
+
+    history.forEach(c => {
+        if (!presets.find(p => p.color === c)) {
+            presets.unshift({ color: c, name: '历史' });
+        }
+    });
+
+    container.innerHTML = presets.slice(0, 8).map(p => `
+        <button class="color-preset w-8 h-8 rounded-lg border-2 border-white shadow-sm hover:scale-110 transition-transform cursor-pointer" 
+                style="background: ${p.color}" 
+                data-color="${p.color}" 
+                title="${p.name}"></button>
+    `).join('');
+}
+
+function renderSocialsEditor() {
+    const container = document.getElementById('socials-editor');
+    container.innerHTML = appData.socials.map((social, index) => `
+        <div class="p-3 bg-white rounded-lg border border-gray-200 space-y-2" data-index="${index}">
+            <div class="flex items-center gap-2">
+                <button class="icon-select-btn w-8 h-8 flex items-center justify-center bg-gray-100 rounded border border-gray-300 hover:bg-gray-200"
+                        onclick="openIconPicker(${index})">
+                    <i class="${social.icon}"></i>
+                </button>
+                <input type="color" class="social-color-input w-8 h-8 rounded cursor-pointer" value="${social.color}" onchange="updateSocial(${index}, 'color', this.value)">
+                <div class="flex-1"></div>
+                <button class="text-red-500 hover:text-red-600 p-1" onclick="deleteSocial('${social.id}')">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+            <input type="text" class="w-full bg-white text-gray-800 border border-gray-300 rounded p-1.5 text-xs" 
+                   value="${social.label || ''}" placeholder="显示文字" 
+                   oninput="updateSocial(${index}, 'label', this.value)">
+            <input type="text" class="w-full bg-white text-gray-800 border border-gray-300 rounded p-1.5 text-xs" 
+                   value="${social.url}" placeholder="URL" 
+                   oninput="updateSocial(${index}, 'url', this.value)">
+            <label class="flex items-center gap-2 text-xs text-gray-600">
+                <input type="checkbox" ${social.newTab ? 'checked' : ''} onchange="updateSocial(${index}, 'newTab', this.checked)">
+                新标签页打开
+            </label>
+        </div>
+    `).join('');
+}
+
+function renderProjectsEditor() {
+    const container = document.getElementById('projects-editor');
+    container.innerHTML = appData.projects.map((project, index) => `
+        <div class="p-3 bg-white rounded-lg border border-gray-200 space-y-2" data-index="${index}">
+            <input type="text" class="w-full bg-white text-gray-800 border border-gray-300 rounded p-2 text-sm font-bold" 
+                   value="${project.title}" placeholder="项目名称"
+                   oninput="updateProject(${index}, 'title', this.value)">
+            
+            <div class="flex gap-2">
+                <select class="bg-white border border-gray-300 rounded p-1 text-xs flex-1"
+                        onchange="updateProject(${index}, 'width', this.value)">
+                    <option value="1x1" ${project.width === '1x1' ? 'selected' : ''}>1x1 (小方块)</option>
+                    <option value="2x1" ${project.width === '2x1' ? 'selected' : ''}>2x1 (宽方块)</option>
+                    <option value="2x2" ${project.width === '2x2' ? 'selected' : ''}>2x2 (大方块)</option>
+                    <option value="3x1" ${project.width === '3x1' ? 'selected' : ''}>3x1 (超宽)</option>
+                    <option value="4x1" ${project.width === '4x1' ? 'selected' : ''}>4x1 (全宽)</option>
+                </select>
+            </div>
+
+            <input type="text" class="w-full bg-white text-gray-800 border border-gray-300 rounded p-2 text-sm" 
+                   value="${project.link || ''}" placeholder="项目链接"
+                   oninput="updateProject(${index}, 'link', this.value)">
+            
+            <div class="flex items-center justify-between">
+                <label class="flex items-center gap-2 text-xs text-gray-600">
+                    <input type="checkbox" ${project.newTab ? 'checked' : ''} onchange="updateProject(${index}, 'newTab', this.checked)">
+                    新标签页打开
+                </label>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <img src="${project.image}" class="w-10 h-10 rounded object-cover bg-gray-100">
+                <input type="file" class="text-xs w-full" accept="image/*" onchange="uploadProjectImage(this, ${index})">
+                <button class="text-red-500 hover:text-red-600 p-2" onclick="deleteProject('${project.id}')">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ============================================
+// Real-time Updates
+// ============================================
+
+function updateProfile(field, value) {
+    appData.profile[field] = value;
+    renderProfile();
+}
+
+function updateSocial(index, field, value) {
+    appData.socials[index][field] = value;
+    renderSocials();
+    // Don't re-render editor to avoid losing focus, except for color which is fine
+}
+
+function updateProject(index, field, value) {
+    appData.projects[index][field] = value;
+    renderProjects();
+}
+
+function addSocial() {
+    appData.socials.push({
+        id: generateId(),
+        platform: 'web',
+        icon: 'fas fa-link',
+        url: '#',
+        color: '#333333',
+        label: 'New Link',
+        newTab: true
+    });
+    renderSocials();
+    renderSocialsEditor();
+}
+
+function deleteSocial(id) {
+    if (confirm('确定删除吗？')) {
+        appData.socials = appData.socials.filter(s => s.id !== id);
+        renderSocials();
+        renderSocialsEditor();
+    }
+}
+
+function addProject() {
+    appData.projects.push({
+        id: generateId(),
+        title: 'New Project',
+        image: 'https://via.placeholder.com/300',
+        link: '#',
+        width: '1x1',
+        newTab: true
+    });
+    renderProjects();
+    renderProjectsEditor();
+}
+
+function deleteProject(id) {
+    if (confirm('确定删除吗？')) {
+        appData.projects = appData.projects.filter(p => p.id !== id);
+        renderProjects();
+        renderProjectsEditor();
+    }
+}
+
+// ============================================
+// Icon Picker
+// ============================================
+
+let currentIconIndex = null;
+
+function openIconPicker(index) {
+    currentIconIndex = index;
+    const modal = document.getElementById('icon-picker-modal');
+    modal.classList.remove('hidden');
+    renderIconGrid(COMMON_ICONS);
+}
+
+function renderIconGrid(icons) {
+    const grid = document.getElementById('icon-grid');
+    grid.innerHTML = icons.map(icon => `
+        <div class="icon-item ${appData.socials[currentIconIndex].icon === icon ? 'selected' : ''}" 
+             onclick="selectIcon('${icon}')">
+            <i class="${icon} text-xl"></i>
+        </div>
+    `).join('');
+}
+
+function selectIcon(icon) {
+    if (currentIconIndex !== null) {
+        appData.socials[currentIconIndex].icon = icon;
+        renderSocials();
+        renderSocialsEditor();
+    }
+    document.getElementById('icon-picker-modal').classList.add('hidden');
+}
+
+// ============================================
+// GitHub API Integration (Preserved)
+// ============================================
 
 function updateTokenUI() {
     const inputSection = document.getElementById('token-input-section');
@@ -310,185 +710,8 @@ function resetToken() {
     }
 }
 
-function closeAdminPanel() {
-    document.getElementById('admin-panel').classList.add('hidden');
-}
-
-function populateEditors() {
-    document.getElementById('edit-name').value = appData.profile.name;
-    document.getElementById('edit-title').value = appData.profile.title;
-    document.getElementById('edit-contact-text').value = appData.profile.contactText;
-    document.getElementById('edit-contact-url').value = appData.profile.contactUrl;
-
-    document.querySelectorAll('.theme-btn').forEach(btn => {
-        btn.classList.toggle('ring-2', btn.dataset.style === appData.theme.style);
-        btn.classList.toggle('ring-blue-500', btn.dataset.style === appData.theme.style);
-    });
-
-    document.getElementById('primary-color').value = appData.theme.primaryColor;
-    document.getElementById('primary-color-hex').textContent = appData.theme.primaryColor;
-    document.getElementById('bg-color').value = appData.theme.bgColor || '#F5EFEA';
-    document.getElementById('bg-color-hex').textContent = appData.theme.bgColor || '#F5EFEA';
-
-    renderColorPresets();
-    renderSocialsEditor();
-    renderProjectsEditor();
-}
-
-function renderColorPresets() {
-    const bgPresetsContainer = document.getElementById('bg-color-presets');
-    const bgHistory = getColorHistory('bg_color_history');
-    let bgPresets = [...DEFAULT_BG_COLORS];
-
-    bgHistory.forEach(c => {
-        if (!bgPresets.find(p => p.color === c)) {
-            bgPresets.unshift({ color: c, name: '历史' });
-        }
-    });
-
-    bgPresetsContainer.innerHTML = bgPresets.slice(0, 8).map(p => `
-        <button class="color-preset w-8 h-8 rounded-lg border-2 border-white shadow-sm hover:scale-110 transition-transform cursor-pointer" 
-                style="background: ${p.color}" 
-                data-color="${p.color}" 
-                data-type="bg"
-                title="${p.name}"></button>
-    `).join('');
-
-    const primaryPresetsContainer = document.getElementById('primary-color-presets');
-    const primaryHistory = getColorHistory('primary_color_history');
-    let primaryPresets = [...DEFAULT_PRIMARY_COLORS];
-
-    primaryHistory.forEach(c => {
-        if (!primaryPresets.find(p => p.color === c)) {
-            primaryPresets.unshift({ color: c, name: '历史' });
-        }
-    });
-
-    primaryPresetsContainer.innerHTML = primaryPresets.slice(0, 8).map(p => `
-        <button class="color-preset w-8 h-8 rounded-lg border-2 border-white shadow-sm hover:scale-110 transition-transform cursor-pointer" 
-                style="background: ${p.color}" 
-                data-color="${p.color}" 
-                data-type="primary"
-                title="${p.name}"></button>
-    `).join('');
-}
-
-function renderSocialsEditor() {
-    const container = document.getElementById('socials-editor');
-    container.innerHTML = appData.socials.map((social, index) => `
-        <div class="p-2 bg-white rounded-lg border border-gray-200 space-y-2" data-id="${social.id}">
-            <div class="flex items-center gap-2">
-                <select class="social-platform flex-shrink-0 bg-white text-gray-800 text-sm p-1 rounded border border-gray-300" data-index="${index}">
-                    ${['instagram', 'linkedin', 'twitter', 'email', 'github', 'youtube', 'web', 'medium', 'wechat'].map(p =>
-        `<option value="${p}" ${p === social.platform ? 'selected' : ''}>${p}</option>`
-    ).join('')}
-                </select>
-                <input type="color" class="social-color w-8 h-8 rounded cursor-pointer" value="${social.color}" data-index="${index}">
-                <button class="delete-social p-1 text-red-500 hover:text-red-600 cursor-pointer" data-index="${index}">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                </button>
-            </div>
-            <input type="text" class="social-label w-full bg-white text-gray-800 border border-gray-300 rounded p-1.5 text-xs" value="${social.label || ''}" placeholder="显示文字 (如: 微信号)" data-index="${index}">
-            <input type="text" class="social-url w-full bg-white text-gray-800 border border-gray-300 rounded p-1.5 text-xs" value="${social.url}" placeholder="链接 URL" data-index="${index}">
-        </div>
-    `).join('');
-}
-
-function renderProjectsEditor() {
-    const container = document.getElementById('projects-editor');
-    container.innerHTML = appData.projects.map((project, index) => `
-        <div class="p-3 bg-white rounded-lg border border-gray-200 space-y-2" data-id="${project.id}">
-            <input type="text" class="project-title w-full bg-white text-gray-800 border border-gray-300 rounded p-2 text-sm" value="${project.title}" placeholder="项目名称" data-index="${index}">
-            <input type="text" class="project-link w-full bg-white text-gray-800 border border-gray-300 rounded p-2 text-sm" value="${project.link || ''}" placeholder="项目链接" data-index="${index}">
-            <div class="flex items-center gap-2">
-                <img src="${project.image}" class="w-12 h-12 rounded object-cover">
-                <input type="file" class="project-image flex-1 text-xs cursor-pointer" accept="image/*" data-index="${index}">
-                <button class="delete-project p-1.5 text-red-500 hover:text-red-600 rounded hover:bg-red-50 cursor-pointer" data-index="${index}">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                </button>
-            </div>
-        </div>
-    `).join('');
-}
-
-// ============================================
-// Data Update Functions
-// ============================================
-
-function updateProfileFromForm() {
-    appData.profile.name = document.getElementById('edit-name').value;
-    appData.profile.title = document.getElementById('edit-title').value;
-    appData.profile.contactText = document.getElementById('edit-contact-text').value;
-    appData.profile.contactUrl = document.getElementById('edit-contact-url').value;
-}
-
-function updateSocialsFromForm() {
-    document.querySelectorAll('.social-platform').forEach((select, index) => {
-        if (appData.socials[index]) appData.socials[index].platform = select.value;
-    });
-    document.querySelectorAll('.social-url').forEach((input, index) => {
-        if (appData.socials[index]) appData.socials[index].url = input.value;
-    });
-    document.querySelectorAll('.social-color').forEach((input, index) => {
-        if (appData.socials[index]) appData.socials[index].color = input.value;
-    });
-    document.querySelectorAll('.social-label').forEach((input, index) => {
-        if (appData.socials[index]) appData.socials[index].label = input.value;
-    });
-}
-
-function updateProjectsFromForm() {
-    document.querySelectorAll('.project-title').forEach((input, index) => {
-        if (appData.projects[index]) appData.projects[index].title = input.value;
-    });
-    document.querySelectorAll('.project-link').forEach((input, index) => {
-        if (appData.projects[index]) appData.projects[index].link = input.value;
-    });
-}
-
-function addSocial() {
-    appData.socials.push({
-        id: generateId(),
-        platform: 'web',
-        url: '#',
-        color: '#333333',
-        label: ''
-    });
-    renderSocialsEditor();
-}
-
-function deleteSocial(index) {
-    appData.socials.splice(index, 1);
-    renderSocialsEditor();
-}
-
-function addProject() {
-    appData.projects.push({
-        id: generateId(),
-        title: 'New Project',
-        image: 'https://via.placeholder.com/300',
-        link: '#'
-    });
-    renderProjectsEditor();
-}
-
-function deleteProject(index) {
-    appData.projects.splice(index, 1);
-    renderProjectsEditor();
-}
-
-// ============================================
-// GitHub API Integration
-// ============================================
-
 async function getFileSha(path) {
-    console.log('[DEBUG] Getting SHA for:', path);
-    console.log('[DEBUG] Using repo:', GITHUB_REPO);
-    console.log('[DEBUG] Token exists:', !!githubToken);
-
     const url = `https://api.github.com/repos/${GITHUB_REPO}/contents/${path}?ref=${GITHUB_BRANCH}&_t=${Date.now()}`;
-    console.log('[DEBUG] Fetching:', url);
-
     try {
         const response = await fetch(url, {
             method: 'GET',
@@ -498,37 +721,27 @@ async function getFileSha(path) {
             }
         });
 
-        console.log('[DEBUG] Response status:', response.status);
-
         if (response.ok) {
             const data = await response.json();
-            console.log('[DEBUG] SHA found:', data.sha);
             return data.sha;
         } else if (response.status === 404) {
-            console.log('[DEBUG] File not found (404), this is a new file');
             return null;
         } else {
-            const errorData = await response.json();
-            console.error('[DEBUG] Error response:', errorData);
-            throw new Error(`Failed to get file info: ${response.status} - ${errorData.message || response.statusText}`);
+            throw new Error(`Failed to get file info: ${response.status}`);
         }
     } catch (error) {
-        console.error('[DEBUG] Exception in getFileSha:', error);
+        console.error('Error getting SHA:', error);
         throw error;
     }
 }
 
 async function uploadToGitHub(path, content, message) {
-    console.log('[DEBUG] Starting upload to:', path);
-
     let sha = null;
     try {
         sha = await getFileSha(path);
     } catch (error) {
-        console.error('[DEBUG] Failed to get SHA, will try to create new file:', error);
+        console.warn('Failed to get SHA, assuming new file or error:', error);
     }
-
-    console.log('[DEBUG] SHA for upload:', sha);
 
     const body = {
         message: message,
@@ -536,12 +749,9 @@ async function uploadToGitHub(path, content, message) {
         branch: GITHUB_BRANCH
     };
 
-    // 关键修复：只有当 SHA 存在时才添加到请求体
     if (sha) {
         body.sha = sha;
     }
-
-    console.log('[DEBUG] Request body keys:', Object.keys(body));
 
     const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${path}`, {
         method: 'PUT',
@@ -553,11 +763,8 @@ async function uploadToGitHub(path, content, message) {
         body: JSON.stringify(body)
     });
 
-    console.log('[DEBUG] Upload response status:', response.status);
-
     if (!response.ok) {
         const error = await response.json();
-        console.error('[DEBUG] Upload error:', error);
         throw new Error(error.message || 'Upload failed');
     }
 
@@ -576,7 +783,7 @@ async function uploadImageToGitHub(file, fileName) {
                 try {
                     sha = await getFileSha(path);
                 } catch (e) {
-                    console.log('[DEBUG] Image does not exist yet, will create');
+                    // Ignore
                 }
 
                 const body = {
@@ -621,14 +828,10 @@ async function saveToGitHub() {
         return;
     }
 
-    updateProfileFromForm();
-    updateSocialsFromForm();
-    updateProjectsFromForm();
-
     const saveBtn = document.getElementById('save-btn');
     const originalText = saveBtn.innerHTML;
     saveBtn.disabled = true;
-    saveBtn.innerHTML = '<svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> 保存中...';
+    saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 保存中...';
 
     try {
         const jsonContent = JSON.stringify(appData, null, 2);
@@ -637,7 +840,7 @@ async function saveToGitHub() {
         showToast('保存成功！', 'success');
         renderPage();
     } catch (error) {
-        console.error('[DEBUG] Save failed:', error);
+        console.error('Save failed:', error);
         showToast('保存失败: ' + error.message, 'error');
     } finally {
         saveBtn.disabled = false;
@@ -645,16 +848,88 @@ async function saveToGitHub() {
     }
 }
 
-async function changePassword() {
-    const newPassword = document.getElementById('new-password').value;
-    if (!newPassword || newPassword.length < 4) {
-        showToast('密码至少需要 4 位', 'error');
+async function uploadProjectImage(input, index) {
+    const file = input.files[0];
+    if (!file) return;
+
+    if (!isTokenVerified || !githubToken) {
+        showToast('请先验证 GitHub Token', 'error');
         return;
     }
 
-    appData.admin.passwordHash = await sha256(newPassword);
-    document.getElementById('new-password').value = '';
-    showToast('密码已更新，请保存到 GitHub', 'success');
+    showToast('上传图片中...', 'info');
+    try {
+        const fileName = `project-${Date.now()}.${file.name.split('.').pop()}`;
+        const url = await uploadImageToGitHub(file, fileName);
+        appData.projects[index].image = url;
+        renderProjects();
+        renderProjectsEditor(); // Refresh to show new image
+        showToast('图片上传成功', 'success');
+    } catch (error) {
+        showToast('图片上传失败: ' + error.message, 'error');
+    }
+}
+
+// ============================================
+// Sync & Download
+// ============================================
+
+async function syncFromGitHub() {
+    if (!isTokenVerified || !githubToken) {
+        showToast('请先验证 GitHub Token', 'error');
+        return;
+    }
+
+    if (!confirm('确定要从 GitHub 拉取最新数据吗？\n这将覆盖当前未保存的修改。')) {
+        return;
+    }
+
+    const btn = document.getElementById('sync-github-btn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 拉取中...';
+    btn.disabled = true;
+
+    try {
+        // Fetch raw content from GitHub API to ensure freshness
+        const url = `https://api.github.com/repos/${GITHUB_REPO}/contents/data.json?ref=${GITHUB_BRANCH}&_t=${Date.now()}`;
+        const response = await fetch(url, {
+            headers: {
+                'Authorization': `token ${githubToken}`,
+                'Accept': 'application/vnd.github.v3+json'
+            }
+        });
+
+        if (!response.ok) throw new Error('Failed to fetch data from GitHub');
+
+        const data = await response.json();
+        const content = decodeURIComponent(escape(atob(data.content)));
+        appData = JSON.parse(content);
+
+        migrateData();
+        renderPage();
+        applyTheme();
+        populateEditors();
+
+        showToast('数据已从 GitHub 同步', 'success');
+    } catch (error) {
+        console.error('Sync failed:', error);
+        showToast('同步失败: ' + error.message, 'error');
+    } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+}
+
+function downloadData() {
+    if (!appData) return;
+
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData, null, 2));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", "data.json");
+    document.body.appendChild(downloadAnchorNode); // required for firefox
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
 }
 
 // ============================================
@@ -663,46 +938,74 @@ async function changePassword() {
 
 document.addEventListener('DOMContentLoaded', () => {
     loadData();
-    checkAdminAccess();
 
     // Admin Toggle
     document.getElementById('admin-toggle').addEventListener('click', showLoginModal);
     document.getElementById('footer-admin-link').addEventListener('click', showLoginModal);
+    document.getElementById('close-admin').addEventListener('click', closeAdminPanel);
+    document.getElementById('admin-backdrop').addEventListener('click', closeAdminPanel);
 
-    // Login Modal
+    // Tab Switching
+    document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            switchTab(btn.dataset.tab);
+        });
+    });
+
+    // Login
     document.getElementById('login-submit').addEventListener('click', attemptLogin);
     document.getElementById('login-cancel').addEventListener('click', hideLoginModal);
     document.getElementById('login-password').addEventListener('keypress', (e) => {
         if (e.key === 'Enter') attemptLogin();
     });
 
-    // Admin Panel
-    document.getElementById('close-admin').addEventListener('click', closeAdminPanel);
-    document.getElementById('admin-backdrop').addEventListener('click', closeAdminPanel);
-
-    // Verify Token
+    // Token
     document.getElementById('verify-token-btn').addEventListener('click', verifyToken);
     document.getElementById('reset-token-btn').addEventListener('click', resetToken);
 
-    // Theme buttons
+    // Sync & Download
+    document.getElementById('sync-github-btn').addEventListener('click', syncFromGitHub);
+    document.getElementById('download-data-btn').addEventListener('click', downloadData);
+
+    // Profile Inputs (Real-time)
+    document.getElementById('edit-name').addEventListener('input', (e) => updateProfile('name', e.target.value));
+    document.getElementById('edit-title').addEventListener('input', (e) => updateProfile('title', e.target.value));
+    document.getElementById('edit-contact-text').addEventListener('input', (e) => updateProfile('contactText', e.target.value));
+    document.getElementById('edit-contact-url').addEventListener('input', (e) => updateProfile('contactUrl', e.target.value));
+
+    // Theme Buttons
     document.querySelectorAll('.theme-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             appData.theme.style = btn.dataset.style;
             if (btn.dataset.style === 'glass' && appData.theme.bgColor === '#F5EFEA') {
-                appData.theme.bgColor = '#667eea';
-                document.getElementById('bg-color').value = '#667eea';
-                document.getElementById('bg-color-hex').textContent = '#667eea';
-            } else if (btn.dataset.style === 'default' && appData.theme.bgColor === '#667eea') {
-                appData.theme.bgColor = '#F5EFEA';
-                document.getElementById('bg-color').value = '#F5EFEA';
-                document.getElementById('bg-color-hex').textContent = '#F5EFEA';
+                appData.theme.bgColor = '#667eea'; // Auto switch to glass color
+            } else if (btn.dataset.style === 'default') {
+                // Force light mode for default
+                if (['#1a1a2e', '#667eea'].includes(appData.theme.bgColor)) {
+                    appData.theme.bgColor = '#F5EFEA';
+                }
             }
             applyTheme();
             populateEditors();
         });
     });
 
-    // Background color
+    // Font Buttons
+    document.querySelectorAll('.font-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            appData.theme.font = btn.dataset.font;
+            applyTheme();
+            populateEditors();
+        });
+    });
+
+    // Font Size Slider
+    document.getElementById('font-size-slider').addEventListener('input', (e) => {
+        appData.theme.fontSize = e.target.value;
+        applyTheme();
+    });
+
+    // Background Color
     document.getElementById('bg-color').addEventListener('input', (e) => {
         appData.theme.bgColor = e.target.value;
         document.getElementById('bg-color-hex').textContent = e.target.value;
@@ -710,57 +1013,22 @@ document.addEventListener('DOMContentLoaded', () => {
         applyTheme();
     });
 
-    // Primary color
-    document.getElementById('primary-color').addEventListener('input', (e) => {
-        appData.theme.primaryColor = e.target.value;
-        document.getElementById('primary-color-hex').textContent = e.target.value;
-        saveColorToHistory('primary_color_history', e.target.value);
-        applyTheme();
-    });
-
-    // Color presets (event delegation)
-    document.addEventListener('click', (e) => {
+    // Color Presets
+    document.getElementById('bg-color-presets').addEventListener('click', (e) => {
         const preset = e.target.closest('.color-preset');
         if (preset) {
-            const color = preset.dataset.color;
-            const type = preset.dataset.type;
-            if (type === 'bg') {
-                appData.theme.bgColor = color;
-                document.getElementById('bg-color').value = color;
-                document.getElementById('bg-color-hex').textContent = color;
-            } else {
-                appData.theme.primaryColor = color;
-                document.getElementById('primary-color').value = color;
-                document.getElementById('primary-color-hex').textContent = color;
-            }
+            appData.theme.bgColor = preset.dataset.color;
             applyTheme();
+            populateEditors();
         }
     });
 
-    // Add social
+    // Add Buttons
     document.getElementById('add-social-btn').addEventListener('click', addSocial);
-
-    // Add project
     document.getElementById('add-project-btn').addEventListener('click', addProject);
     document.getElementById('add-project-editor-btn').addEventListener('click', addProject);
 
-    // Delete social (event delegation)
-    document.getElementById('socials-editor').addEventListener('click', (e) => {
-        const deleteBtn = e.target.closest('.delete-social');
-        if (deleteBtn) {
-            deleteSocial(parseInt(deleteBtn.dataset.index));
-        }
-    });
-
-    // Delete project (event delegation)
-    document.getElementById('projects-editor').addEventListener('click', (e) => {
-        const deleteBtn = e.target.closest('.delete-project');
-        if (deleteBtn) {
-            deleteProject(parseInt(deleteBtn.dataset.index));
-        }
-    });
-
-    // Avatar upload
+    // Avatar Upload
     document.getElementById('avatar-upload-btn').addEventListener('click', () => {
         document.getElementById('avatar-input').click();
     });
@@ -778,41 +1046,36 @@ document.addEventListener('DOMContentLoaded', () => {
             const fileName = `avatar-${Date.now()}.${file.name.split('.').pop()}`;
             const url = await uploadImageToGitHub(file, fileName);
             appData.profile.avatar = url;
-            document.getElementById('avatar').src = url;
+            renderProfile();
             showToast('头像上传成功', 'success');
         } catch (error) {
             showToast('头像上传失败: ' + error.message, 'error');
         }
     });
 
-    // Project image upload (event delegation)
-    document.getElementById('projects-editor').addEventListener('change', async (e) => {
-        if (e.target.classList.contains('project-image')) {
-            const file = e.target.files[0];
-            const index = parseInt(e.target.dataset.index);
-            if (!file) return;
-
-            if (!isTokenVerified || !githubToken) {
-                showToast('请先验证 GitHub Token', 'error');
-                return;
-            }
-
-            showToast('上传图片中...', 'info');
-            try {
-                const fileName = `project-${Date.now()}.${file.name.split('.').pop()}`;
-                const url = await uploadImageToGitHub(file, fileName);
-                appData.projects[index].image = url;
-                renderProjectsEditor();
-                showToast('图片上传成功', 'success');
-            } catch (error) {
-                showToast('图片上传失败: ' + error.message, 'error');
-            }
-        }
-    });
-
-    // Save button
+    // Save Button
     document.getElementById('save-btn').addEventListener('click', saveToGitHub);
 
-    // Change password
-    document.getElementById('change-password-btn').addEventListener('click', changePassword);
+    // Password Change
+    document.getElementById('change-password-btn').addEventListener('click', async () => {
+        const newPassword = document.getElementById('new-password').value;
+        if (!newPassword || newPassword.length < 4) {
+            showToast('密码至少需要 4 位', 'error');
+            return;
+        }
+        appData.admin.passwordHash = await sha256(newPassword);
+        document.getElementById('new-password').value = '';
+        showToast('密码已更新，请保存到 GitHub', 'success');
+    });
+
+    // Icon Picker Search
+    document.getElementById('icon-search').addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase();
+        const filtered = COMMON_ICONS.filter(icon => icon.includes(term));
+        renderIconGrid(filtered);
+    });
+
+    document.getElementById('close-icon-picker').addEventListener('click', () => {
+        document.getElementById('icon-picker-modal').classList.add('hidden');
+    });
 });
