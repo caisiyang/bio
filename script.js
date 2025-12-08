@@ -317,7 +317,7 @@ function renderSocials() {
         // Determine back content
         let backContent = '';
         if (hasLink) {
-            backContent = `<div class="back-link">跳转链接 <i class="fas fa-external-link-alt"></i></div>`;
+            backContent = `<div class="back-link">リンクへ移動 <i class="fas fa-external-link-alt"></i></div>`;
         } else if (urlValue) {
             // Show the URL field value (e.g., WeChat ID, phone number, etc.)
             backContent = `<div class="back-content">${urlValue}</div>`;
@@ -388,7 +388,7 @@ function renderProjects() {
                 backContent += `<div class="absolute inset-0 flex items-center justify-center bg-black/30 rounded-2xl"><i class="fas fa-external-link-alt text-white text-2xl"></i></div>`;
             }
         } else if (hasLink) {
-            backContent = `<div class="back-link">跳转链接 <i class="fas fa-external-link-alt"></i></div>`;
+            backContent = `<div class="back-link">リンクへ移動 <i class="fas fa-external-link-alt"></i></div>`;
         } else if (project.link) {
             // Show text content if it's not a valid link but has content
             backContent = `<div class="back-content p-4 text-center break-words text-sm">${project.link}</div>`;
