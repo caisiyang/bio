@@ -430,7 +430,7 @@ function renderProjects() {
 
             frontContent = `
                 ${visualContent}
-                ${project.title ? `<h3 class="font-semibold text-xs text-text-main leading-tight mt-auto truncate flex-shrink-0">${project.title}</h3>` : ''}
+                ${project.title ? `<h3 class="project-title-text font-semibold text-xs text-text-main leading-tight mt-auto flex-shrink-0 overflow-hidden w-full" style="container-type: inline-size;"><span class="project-title-inner inline-block whitespace-nowrap">${project.title}</span></h3>` : ''}
             `;
         }
 
@@ -462,6 +462,8 @@ function renderProjects() {
     attachFlipListeners();
     // Initialize auto-flip
     initAutoFlip();
+    // Initialize marquee for long project titles
+    initProjectTitleMarquee();
 }
 
 // Auto Flip Logic
@@ -496,6 +498,33 @@ function initAutoFlip() {
             currentInterval = startFlip();
         });
     });
+}
+
+// Project Title Marquee Animation for long text
+function initProjectTitleMarquee() {
+    // Wait a bit for DOM to fully render
+    setTimeout(() => {
+        document.querySelectorAll('.project-title-text').forEach(container => {
+            const inner = container.querySelector('.project-title-inner');
+            if (!inner) return;
+
+            // Calculate overflow amount
+            const textWidth = inner.scrollWidth;
+            const containerWidth = container.clientWidth;
+            const overflow = textWidth - containerWidth;
+
+            // Check if text overflows
+            if (overflow > 0) {
+                // Text is too long, set CSS variable for scroll distance and add animation
+                inner.style.setProperty('--scroll-distance', `-${overflow}px`);
+                inner.classList.add('project-title-marquee');
+            } else {
+                // Text fits, remove animation if any
+                inner.classList.remove('project-title-marquee');
+                inner.style.removeProperty('--scroll-distance');
+            }
+        });
+    }, 100);
 }
 
 // Flip Card Event Handler
